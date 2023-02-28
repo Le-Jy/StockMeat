@@ -1,6 +1,4 @@
 #include "board.h"
-#include "piece.h"
-#include <stdlib.h>
 
 void initBoard(struct piece **board, enum Color colorPlayer)
 {
