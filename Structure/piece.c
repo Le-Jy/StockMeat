@@ -3,6 +3,7 @@
 void list_init(struct list *list)
 {
     list->next = NULL;
+    list->data=-1;
 }
 
 int list_is_empty(struct list *list)

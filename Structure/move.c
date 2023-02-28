@@ -17,43 +17,98 @@ int respectedRangeHorizontal(struct piece** board, struct piece* piece, int i)
 
 void getMoves(struct piece** board, struct piece* piece, int playercolor)
 {
-    if(piece->color == playercolor)
+    switch(piece->role)
+    {
+        case PAWN:
+        getPawnMoves(board, piece, playercolor);
+        break;
+    }
+    
+}
+
+void getPawnMoves(struct piece** board, struct piece* piece, int playercolor)
+{
+    if(playercolor == piece->color)
     {
         int v = respectedRangeVertical(board, piece, -1);
         int h = respectedRangeHorizontal(board, piece, -1);
-        switch(piece->role)
+        if(v && board[piece->x+(piece->y-1)*8]->role==EMPTY)//front 1 box
         {
-            case PAWN:
-            if(v && board[piece->x+(piece->y-1)*8]->role==EMPTY)//front
-            {
-                struct list *newmove = malloc(sizeof(struct list));
-                newmove->next = NULL;
-                newmove->data = piece->x+(piece->y-1)*8;
-                piece->possibleMoves->next = newmove;
-                piece->possibleMoves = piece->possibleMoves->next;
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = piece->x+(piece->y-1)*8;
+            piece->possibleMoves = newmove;
 
-            }
-            if(h && v && board[piece->x-1+(piece->y-1)*8]->color!=playercolor && board[piece->x+1+(piece->y-1)*8]->color!=NONE)//left diag (can eat)
+        }
+        if(h && v && board[piece->x-1+(piece->y-1)*8]->color!=playercolor && board[piece->x+1+(piece->y-1)*8]->color!=NONE)//left diag (can eat)
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = piece->x-1+(piece->y-1)*8;
+            piece->possibleMoves = newmove;
+        }
+        h = respectedRangeHorizontal(board, piece, 1);
+        if(h && v && board[piece->x+1+(piece->y-1)*8]->color!=playercolor && board[piece->x+1+(piece->y-1)*8]->color!=NONE)//right diag (can eat)
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = piece->x+1+(piece->y-1)*8;
+            piece->possibleMoves = newmove;
+            
+        }
+        if(piece->y==6)
+        {
+            int v = respectedRangeVertical(board, piece, -2);
+            if(v && board[piece->x+(piece->y-2)*8]->role==EMPTY)//front 2 boxes
             {
-                printf("2\n");
                 struct list *newmove = malloc(sizeof(struct list));
-                newmove->next = NULL;
-                newmove->data = piece->x-1+(piece->y-1)*8;
-                piece->possibleMoves->next = newmove;
-                piece->possibleMoves = piece->possibleMoves->next;
+                newmove->next = piece->possibleMoves;
+                newmove->data = piece->x+(piece->y-2)*8;
+                piece->possibleMoves = newmove;
             }
-            v = respectedRangeVertical(board, piece, 1);
-            h = respectedRangeHorizontal(board, piece, 1);
-            if(h && v && board[piece->x+1+(piece->y-1)*8]->color!=playercolor && board[piece->x+1+(piece->y-1)*8]->color!=NONE)//right diag (can eat)
-            {
-                printf("3\n");
-                struct list *newmove = malloc(sizeof(struct list));
-                newmove->next = NULL;
-                newmove->data = piece->x+1+(piece->y-1)*8;
-                piece->possibleMoves->next = newmove;
-                piece->possibleMoves = piece->possibleMoves->next;
-            }
-            break;
+
         }
     }
+    else
+    {
+        int v = respectedRangeVertical(board, piece, 1);
+        int h = respectedRangeHorizontal(board, piece, 1);
+        if(v && board[piece->x+(piece->y+1)*8]->role==EMPTY)//front 1 box
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = piece->x+(piece->y+1)*8;
+            piece->possibleMoves = newmove;
+
+        }
+        if(h && v && board[piece->x-1+(piece->y+1)*8]->color!=playercolor && board[piece->x+1+(piece->y+1)*8]->color!=NONE)//left diag (can eat)
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = piece->x-1+(piece->y+1)*8;
+            piece->possibleMoves = newmove;
+        }
+        h = respectedRangeHorizontal(board, piece, 1);
+        if(h && v && board[piece->x+1+(piece->y+1)*8]->color!=playercolor && board[piece->x+1+(piece->y+1)*8]->color!=NONE)//right diag (can eat)
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = piece->x+1+(piece->y+1)*8;
+            piece->possibleMoves = newmove;
+            
+        }
+        if(piece->y==1)
+        {
+            int v = respectedRangeVertical(board, piece, 2);
+            if(v && board[piece->x+(piece->y+2)*8]->role==EMPTY)//front 2 boxes
+            {
+                struct list *newmove = malloc(sizeof(struct list));
+                newmove->next = piece->possibleMoves;
+                newmove->data = piece->x+(piece->y+2)*8;
+                piece->possibleMoves = newmove;
+            }
+
+        }
+    }
+
 }

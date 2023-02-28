@@ -10,19 +10,17 @@ void main()
     int c = 1;
     for(int j = 0;j<64;j++,c++)
     {
-        printf(" %i ",board[j]->role);
+        printf(" %i ",board[j]->color);
         if(c%8==0)
         {
             printf("\n");
         }
     }
-    printf("%i\n", board[0+6*8]->role);
-    getMoves(board,board[0+6*8],WHITE);
-    while(board[0+6*8]->possibleMoves->next)
+    getMoves(board,board[7+1*8],WHITE);
+    while(board[7+1*8]->possibleMoves->data >= 0)
     {
-        
-        board[0+6*8]->possibleMoves = board[0+6*8]->possibleMoves->next;
-        printf("%i\n",board[0+6*8]->possibleMoves->data);
+        printf("%i\n",board[7+1*8]->possibleMoves->data);        
+        board[7+1*8]->possibleMoves = board[7+1*8]->possibleMoves->next;
     }
         
 }
