@@ -25,6 +25,9 @@ void getMoves(struct piece** board, struct piece* piece, int playercolor)
         case BISHOP:
         getBishopMoves(board,piece);
         break;
+        case KNIGHT:
+        getKnightMoves(board,piece);
+        break;
     }
     
 }
@@ -227,7 +230,95 @@ void getBishopMoves(struct piece** board, struct piece* piece)
 
 void getKnightMoves(struct piece** board, struct piece* piece)
 {
-    return;
+    int move = (piece->x+2)+(piece->y+1)*8;
+    if(move<64 && move>-1)
+    {
+        if(board[move]->color!=piece->color)
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = move;
+            piece->possibleMoves = newmove;
+        }
+    }
+    move = (piece->x+2)+(piece->y-1)*8;
+    if(move<64 && move>-1)
+    {
+        if(board[move]->color!=piece->color)
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = move;
+            piece->possibleMoves = newmove;
+        }
+    }
+    move = (piece->x-2)+(piece->y+1)*8;
+    if(move<64 && move>-1)
+    {
+        if(board[move]->color!=piece->color)
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = move;
+            piece->possibleMoves = newmove;
+        }
+    }
+    move = (piece->x-2)+(piece->y-1)*8;
+    if(move<64 && move>-1)
+    {
+        if(board[move]->color!=piece->color)
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = move;
+            piece->possibleMoves = newmove;
+        }
+    }
+    //next
+    move = (piece->x+1)+(piece->y+2)*8;
+    if(move<64 && move>-1)
+    {
+        if(board[move]->color!=piece->color)
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = move;
+            piece->possibleMoves = newmove;
+        }
+    }
+    move = (piece->x+1)+(piece->y-2)*8;
+    if(move<64 && move>-1)
+    {
+        if(board[move]->color!=piece->color)
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = move;
+            piece->possibleMoves = newmove;
+        }
+    }
+    move = (piece->x-1)+(piece->y+2)*8;
+    if(move<64 && move>-1)
+    {
+        if(board[move]->color!=piece->color)
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = move;
+            piece->possibleMoves = newmove;
+        }
+    }
+    move = (piece->x-1)+(piece->y-2)*8;
+    if(move<64 && move>-1)
+    {
+        if(board[move]->color!=piece->color)
+        {
+            struct list *newmove = malloc(sizeof(struct list));
+            newmove->next = piece->possibleMoves;
+            newmove->data = move;
+            piece->possibleMoves = newmove;
+        }
+    }
 }
 
 void getRookMoves(struct piece** board, struct piece* piece, int playercolor)

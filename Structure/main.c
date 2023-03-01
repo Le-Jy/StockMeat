@@ -5,14 +5,10 @@
 
 void main()
 {
-    int p = 2;
+    int p = 1;
     struct piece **board = malloc(64*sizeof(struct piece));
     initBoard(board,WHITE);
     
-    board[1+1*8]->role = EMPTY;
-    board[1+1*8]->color = NONE;
-    board[3+1*8]->role = EMPTY;
-    board[3+1*8]->color = NONE;
     int c = 1;
     for(int j = 0;j<64;j++,c++)
     {
