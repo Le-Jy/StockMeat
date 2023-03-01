@@ -5,22 +5,28 @@
 
 void main()
 {
+    int p = 2;
     struct piece **board = malloc(64*sizeof(struct piece));
     initBoard(board,WHITE);
+    
+    board[1+1*8]->role = EMPTY;
+    board[1+1*8]->color = NONE;
+    board[3+1*8]->role = EMPTY;
+    board[3+1*8]->color = NONE;
     int c = 1;
     for(int j = 0;j<64;j++,c++)
     {
-        printf(" %i ",board[j]->color);
+        printf(" %i ",board[j]->role);
         if(c%8==0)
         {
             printf("\n");
         }
     }
-    getMoves(board,board[7+1*8],WHITE);
-    while(board[7+1*8]->possibleMoves->data >= 0)
+    getMoves(board,board[p],WHITE);
+    while(board[p]->possibleMoves->data >= 0)
     {
-        printf("%i\n",board[7+1*8]->possibleMoves->data);        
-        board[7+1*8]->possibleMoves = board[7+1*8]->possibleMoves->next;
+        printf("%i\n",board[p]->possibleMoves->data);        
+        board[p]->possibleMoves = board[p]->possibleMoves->next;
     }
         
 }
