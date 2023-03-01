@@ -10,7 +10,7 @@ void getPawnMoves(struct piece** board, struct piece* piece, int playercolor);
 
 void getBishopMoves(struct piece** board, struct piece* piece);
 
-void getKnightMoves(struct piece** board, struct piece* piece, int playercolor);
+void getKnightMoves(struct piece** board, struct piece* piece);
 
 void getRookMoves(struct piece** board, struct piece* piece, int playercolor);
 

@@ -225,7 +225,7 @@ void getBishopMoves(struct piece** board, struct piece* piece)
    
 }
 
-void getKnightMoves(struct piece** board, struct piece* piece, int playercolor)
+void getKnightMoves(struct piece** board, struct piece* piece)
 {
     return;
 }
