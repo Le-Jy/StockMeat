@@ -5,10 +5,11 @@
 
 void main()
 {
-    int p = 1;
+    int p = 0;
     struct piece **board = malloc(64*sizeof(struct piece));
     initBoard(board,WHITE);
-    
+    board[8]->color = NONE;
+    board[8]->role = EMPTY;
     int c = 1;
     for(int j = 0;j<64;j++,c++)
     {
@@ -18,6 +19,8 @@ void main()
             printf("\n");
         }
     }
+    
+
     getMoves(board,board[p],WHITE);
     while(board[p]->possibleMoves->data >= 0)
     {

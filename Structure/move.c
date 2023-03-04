@@ -20,14 +20,22 @@ void getMoves(struct piece** board, struct piece* piece, int playercolor)
     switch(piece->role)
     {
         case PAWN:
-        getPawnMoves(board, piece, playercolor);
-        break;
+            getPawnMoves(board, piece, playercolor);
+            break;
         case BISHOP:
-        getBishopMoves(board,piece);
-        break;
+            getBishopMoves(board,piece);
+            break;
         case KNIGHT:
-        getKnightMoves(board,piece);
-        break;
+            getKnightMoves(board,piece);
+            break;
+        case ROOK:
+            getRookMoves(board,piece);
+            break;
+        case QUEEN:
+            getQueenMoves(board, piece);
+            break;
+        case KING:
+            getKingMoves(board,piece);
     }
     
 }
@@ -321,17 +329,96 @@ void getKnightMoves(struct piece** board, struct piece* piece)
     }
 }
 
-void getRookMoves(struct piece** board, struct piece* piece, int playercolor)
+void getRookMoves(struct piece** board, struct piece* piece)
 {
-    return;
+    int dirNegV = 1;
+    int dirPosV = 1;
+    int dirNegH = 1;
+    int dirPosH = 1;
+    int i = 1;
+    int negV = respectedRangeVertical(board,piece,-i);
+    int posV = respectedRangeVertical(board,piece,i);
+    int negH = respectedRangeHorizontal(board,piece,-i);
+    int posH = respectedRangeHorizontal(board,piece,i);
+    printf("%i , %i , %i , %i\n",dirNegV,dirPosV,dirNegH,dirPosH);
+    printf("%i , %i , %i , %i\n",negV,posV,negH,posH);
+    while((dirNegH || dirNegV || dirPosH || dirPosV) && i<8)
+    {
+        if(dirNegV && negV)
+        {
+            if(board[piece->x + (piece->y-i)*8]->color != piece->color)
+            {
+                struct list *newmove = malloc(sizeof(struct list));
+                newmove->next = piece->possibleMoves;
+                newmove->data = piece->x + (piece->y-i)*8;
+                piece->possibleMoves = newmove;
+                if(board[piece->x + (piece->y-i)*8]->color != NONE)
+                    dirNegV = 0;
+            }
+            else
+                dirNegV = 0;
+        }
+        if(dirPosV && posV)
+        {
+            if(board[piece->x + (piece->y + i)*8]->color != piece->color)
+            {
+                struct list *newmove = malloc(sizeof(struct list));
+                newmove->next = piece->possibleMoves;
+                newmove->data = piece->x + (piece->y+i)*8;
+                piece->possibleMoves = newmove;
+                if(board[piece->x + (piece->y + i)*8]->color != NONE)
+                    dirPosV = 0;
+            }
+            else
+                dirPosV = 0;
+        }
+        if(dirNegH && negH)
+        {
+            if(board[piece->x-i + piece->y*8]->color != piece->color)
+            {
+                struct list *newmove = malloc(sizeof(struct list));
+                newmove->next = piece->possibleMoves;
+                newmove->data = piece->x-i + piece->y*8;
+                piece->possibleMoves = newmove;
+                if(board[piece->x - i + piece->y*8]->color != NONE)
+                    dirNegH = 0;
+            }
+            else
+                dirNegH = 0;
+        }
+        if(dirPosH && posH)
+        {
+            if(board[piece->x + i + piece->y*8]->color != piece->color)
+            {
+                struct list *newmove = malloc(sizeof(struct list));
+                newmove->next = piece->possibleMoves;
+                newmove->data = piece->x + i + piece->y*8;
+                piece->possibleMoves = newmove;
+                if(board[piece->x + i + piece->y*8]->color != NONE)
+                    dirPosH = 0;
+            }
+            else
+                dirPosH = 0;
+        }
+        i++;
+        if(dirNegV && negV)
+            negV = respectedRangeVertical(board,piece,-i);
+        if(dirPosV && posV)
+            posV = respectedRangeVertical(board,piece,i);
+        if(dirNegH && negH)
+            negH = respectedRangeHorizontal(board,piece,-i);
+        if(dirPosH && posH)
+            posH = respectedRangeHorizontal(board,piece,i);
+    }
 }
 
-void getQueenMoves(struct piece** board, struct piece* piece, int playercolor)
+void getQueenMoves(struct piece** board, struct piece* piece)
 {
-    return;
+    getRookMoves(board,piece);
+    getBishopMoves(board,piece);
 }
 
-void getKingMoves(struct piece** board, struct piece* piece, int playercolor)
+void getKingMoves(struct piece** board, struct piece* piece)
 {
     return;
 }

@@ -12,8 +12,8 @@ void getBishopMoves(struct piece** board, struct piece* piece);
 
 void getKnightMoves(struct piece** board, struct piece* piece);
 
-void getRookMoves(struct piece** board, struct piece* piece, int playercolor);
+void getRookMoves(struct piece** board, struct piece* piece);
 
-void getQueenMoves(struct piece** board, struct piece* piece, int playercolor);
+void getQueenMoves(struct piece** board, struct piece* piece);
 
-void getKingMoves(struct piece** board, struct piece* piece, int playercolor);
+void getKingMoves(struct piece** board, struct piece* piece);
