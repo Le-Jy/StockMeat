@@ -340,8 +340,6 @@ void getRookMoves(struct piece** board, struct piece* piece)
     int posV = respectedRangeVertical(board,piece,i);
     int negH = respectedRangeHorizontal(board,piece,-i);
     int posH = respectedRangeHorizontal(board,piece,i);
-    printf("%i , %i , %i , %i\n",dirNegV,dirPosV,dirNegH,dirPosH);
-    printf("%i , %i , %i , %i\n",negV,posV,negH,posH);
     while((dirNegH || dirNegV || dirPosH || dirPosV) && i<8)
     {
         if(dirNegV && negV)
@@ -420,5 +418,65 @@ void getQueenMoves(struct piece** board, struct piece* piece)
 
 void getKingMoves(struct piece** board, struct piece* piece)
 {
-    return;
+    int vNeg = respectedRangeVertical(board, piece, -1);
+    int vPos = respectedRangeVertical(board, piece, 1);
+    int hNeg = respectedRangeHorizontal(board, piece, -1);
+    int hPos = respectedRangeHorizontal(board, piece, 1);
+    if(vNeg && board[piece->x+(piece->y-1)*8]->color != piece->color)
+    {
+        struct list* newmove = malloc(sizeof(struct list));
+        newmove->next = piece->possibleMoves;
+        newmove->data = piece->x+(piece->y-1)*8;
+        piece->possibleMoves = newmove;
+    }
+    if(hNeg && board[piece->x-1+(piece->y)*8]->color != piece->color)
+    {
+        struct list* newmove = malloc(sizeof(struct list));
+        newmove->next = piece->possibleMoves;
+        newmove->data = piece->x-1+(piece->y)*8;
+        piece->possibleMoves = newmove;
+    }
+    
+    if(vPos && board[piece->x+(piece->y+1)*8]->color != piece->color)
+    {
+        struct list* newmove = malloc(sizeof(struct list));
+        newmove->next = piece->possibleMoves;
+        newmove->data = piece->x+(piece->y+1)*8;
+        piece->possibleMoves = newmove;
+    }
+    if(hPos && board[piece->x+1+(piece->y)*8]->color != piece->color)
+    {
+        struct list* newmove = malloc(sizeof(struct list));
+        newmove->next = piece->possibleMoves;
+        newmove->data = piece->x+1+(piece->y)*8;
+        piece->possibleMoves = newmove;
+    }
+    if(vNeg && hNeg && board[piece->x-1+(piece->y-1)*8]->color != piece->color)
+    {
+        struct list* newmove = malloc(sizeof(struct list));
+        newmove->next = piece->possibleMoves;
+        newmove->data = piece->x-1+(piece->y-1)*8;
+        piece->possibleMoves = newmove;
+    }
+    if(vPos && hPos && board[piece->x+1+(piece->y+1)*8]->color != piece->color)
+    {
+        struct list* newmove = malloc(sizeof(struct list));
+        newmove->next = piece->possibleMoves;
+        newmove->data = piece->x+1+(piece->y+1)*8;
+        piece->possibleMoves = newmove;
+    }
+    if(vNeg && hPos && board[piece->x+1+(piece->y-1)*8]->color != piece->color)
+    {
+        struct list* newmove = malloc(sizeof(struct list));
+        newmove->next = piece->possibleMoves;
+        newmove->data = piece->x+1+(piece->y-1)*8;
+        piece->possibleMoves = newmove;
+    }
+    if(vPos && hNeg && board[piece->x-1+(piece->y+1)*8]->color != piece-> color)
+    {
+        struct list* newmove = malloc(sizeof(struct list));
+        newmove->next = piece->possibleMoves;
+        newmove->data = piece->x-1+(piece->y+1)*8;
+        piece->possibleMoves = newmove;
+    }
 }

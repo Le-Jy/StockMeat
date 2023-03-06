@@ -24,8 +24,8 @@ enum Role {
 };
 enum Color{
     BLACK = 1,
-    WHITE = 0,
-    NONE = -2
+    WHITE = -1,
+    NONE = 0
 
 };
 
