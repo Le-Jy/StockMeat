@@ -14,7 +14,6 @@ int respectedRangeHorizontal(struct piece** board, struct piece* piece, int i)
     return 0;
 }
 
-
 void getMoves(struct piece** board, struct piece* piece, int playercolor)
 {
     switch(piece->role)
@@ -44,6 +43,7 @@ void getPawnMoves(struct piece** board, struct piece* piece, int playercolor)
 {
     if(playercolor == piece->color)
     {
+        
         int v = respectedRangeVertical(board, piece, -1);
         int h = respectedRangeHorizontal(board, piece, -1);
         if(v && board[piece->x+(piece->y-1)*8]->role==EMPTY)//front 1 box
@@ -479,4 +479,54 @@ void getKingMoves(struct piece** board, struct piece* piece)
         newmove->data = piece->x-1+(piece->y+1)*8;
         piece->possibleMoves = newmove;
     }
+}
+
+int isCheck(struct piece** board, struct piece** listOfPieces)
+{
+    // for(size_t i = 0;i<32;i++)
+    // {
+    //     getMoves(board, listOfPieces[i],WHITE);
+    //     printf("3\n");
+    //     while(listOfPieces[i]->possibleMoves!=NULL)
+    //     {
+    //         printf("%i\n",listOfPieces[i]->possibleMoves->data);
+    //         if(board[listOfPieces[i]->possibleMoves->data]->role==KING && board[listOfPieces[i]->possibleMoves->data]->color != listOfPieces[i]->color)
+    //             return i;
+    //         listOfPieces[i]->possibleMoves = listOfPieces[i]->possibleMoves->next;
+    //     }
+    // }
+    // return 0;
+}
+
+int move(struct piece** board, struct piece* piece, int x, int y, struct piece** listOfPieces)
+{
+    while(piece->possibleMoves)
+    {
+        if(piece->possibleMoves->data == x+y*8)
+            break;
+        piece->possibleMoves = piece->possibleMoves->next;
+    }
+    if(piece->possibleMoves == NULL)
+        return 0;
+    struct piece* sw = board[x+y*8];
+
+    board[piece->x+piece->y*8] = sw;
+    board[x+y*8] = piece;
+
+    int tmpx = piece->x;
+    int tmpy = piece->y;
+    piece->x = x;
+    piece->y = y;
+    // int isCheckIndex = isCheck(board, listOfPieces);
+    // if(listOfPieces[isCheckIndex]->color != piece->color)
+    // {
+    //     board[piece->x+piece->y*8] = piece;
+    //     piece->x = tmpx;
+    //     piece->y = tmpy;
+    //     board[x+y*8]=sw;
+    // }
+
+
+    
+    return 1;
 }

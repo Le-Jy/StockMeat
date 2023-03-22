@@ -2,4 +2,4 @@
 #include "piece.h"
 #include <stdlib.h>
 
-void initBoard(struct piece **board, enum Color colorplayer);
+void initBoard(struct piece **board, enum Color colorPlayer, struct piece** listOfPieces);

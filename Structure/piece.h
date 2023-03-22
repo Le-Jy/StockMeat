@@ -14,7 +14,7 @@ void list_init(struct list *list);
 int list_is_empty(struct list *list);
 
 enum Role {
-    EMPTY = -1,
+    EMPTY = 0,
     PAWN = 1,
     BISHOP = 2,
     KNIGHT = 3,
@@ -36,6 +36,7 @@ struct piece {
     enum Color color;
     int value;
     struct list *possibleMoves;
+    int index;
 };
 
-void newpiece (struct piece *newpiece,int x,int y,enum Color color);
+void newpiece (struct piece *newpiece,int x,int y,enum Color color,int index);
