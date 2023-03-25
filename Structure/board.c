@@ -11,6 +11,7 @@ void initBoard(struct piece **board, enum Color colorPlayer, struct piece** list
             {
                 struct piece *new = malloc(sizeof(struct piece));
                 newpiece(new,j,i,WHITE,cpt);
+                new->realPlayerColor = colorPlayer;
                 board[i*8+j] = new;
                 listOfPiece[cpt] = new;
                 cpt++;
@@ -33,6 +34,7 @@ void initBoard(struct piece **board, enum Color colorPlayer, struct piece** list
             {
                 struct piece *new = malloc(sizeof(struct piece));
                 newpiece(new,j,i,BLACK,cpt);
+                new->realPlayerColor = colorPlayer;
                 board[i*8+j] = new;
                 listOfPiece[cpt] = new;
                 cpt++;
@@ -49,6 +51,7 @@ void initBoard(struct piece **board, enum Color colorPlayer, struct piece** list
             {
                 struct piece *new = malloc(sizeof(struct piece));
                 newpiece(new,j,i,BLACK,cpt);
+                new->realPlayerColor = colorPlayer;
                 board[i*8+j] = new;
                 listOfPiece[cpt] = new;
                 cpt++;
@@ -62,8 +65,6 @@ void initBoard(struct piece **board, enum Color colorPlayer, struct piece** list
                 struct piece *new = malloc(sizeof(struct piece));
                 newpiece(new,j,i,NONE,0);
                 board[i*8+j] = new;
-                listOfPiece[cpt] = new;
-                cpt++;
             }
             
         }
@@ -73,6 +74,7 @@ void initBoard(struct piece **board, enum Color colorPlayer, struct piece** list
             {
                 struct piece *new = malloc(sizeof(struct piece));
                 newpiece(new,j,i,WHITE,cpt);
+                new->realPlayerColor = colorPlayer;
                 board[i*8+j] = new;
                 listOfPiece[cpt] = new;
                 cpt++;

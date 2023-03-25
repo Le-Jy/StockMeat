@@ -41,6 +41,7 @@ void getMoves(struct piece** board, struct piece* piece, int playercolor)
 
 void getPawnMoves(struct piece** board, struct piece* piece, int playercolor)
 {
+    piece->possibleMoves = NULL;
     if(playercolor == piece->color)
     {
         
@@ -129,6 +130,8 @@ void getPawnMoves(struct piece** board, struct piece* piece, int playercolor)
 
 void getBishopMoves(struct piece** board, struct piece* piece)
 {
+    if(piece->role!=QUEEN)
+        piece->possibleMoves = NULL;
     int posLeftDiag = 1;
     int frontRightDiag = 1;
     int negLeftDiag = 1;
@@ -238,6 +241,7 @@ void getBishopMoves(struct piece** board, struct piece* piece)
 
 void getKnightMoves(struct piece** board, struct piece* piece)
 {
+    piece->possibleMoves = NULL;
     int move = (piece->x+2)+(piece->y+1)*8;
     if(move<64 && move>-1)
     {
@@ -331,6 +335,8 @@ void getKnightMoves(struct piece** board, struct piece* piece)
 
 void getRookMoves(struct piece** board, struct piece* piece)
 {
+    if(piece->role!=QUEEN)
+        piece->possibleMoves = NULL;
     int dirNegV = 1;
     int dirPosV = 1;
     int dirNegH = 1;
@@ -412,12 +418,14 @@ void getRookMoves(struct piece** board, struct piece* piece)
 
 void getQueenMoves(struct piece** board, struct piece* piece)
 {
+    piece->possibleMoves = NULL;
     getRookMoves(board,piece);
     getBishopMoves(board,piece);
 }
 
 void getKingMoves(struct piece** board, struct piece* piece)
 {
+    piece->possibleMoves = NULL;
     int vNeg = respectedRangeVertical(board, piece, -1);
     int vPos = respectedRangeVertical(board, piece, 1);
     int hNeg = respectedRangeHorizontal(board, piece, -1);
@@ -481,21 +489,36 @@ void getKingMoves(struct piece** board, struct piece* piece)
     }
 }
 
-int isCheck(struct piece** board, struct piece** listOfPieces)
+int isCheck(struct piece** board, struct piece** listOfPieces, int color)
 {
-    // for(size_t i = 0;i<32;i++)
-    // {
-    //     getMoves(board, listOfPieces[i],WHITE);
-    //     printf("3\n");
-    //     while(listOfPieces[i]->possibleMoves!=NULL)
-    //     {
-    //         printf("%i\n",listOfPieces[i]->possibleMoves->data);
-    //         if(board[listOfPieces[i]->possibleMoves->data]->role==KING && board[listOfPieces[i]->possibleMoves->data]->color != listOfPieces[i]->color)
-    //             return i;
-    //         listOfPieces[i]->possibleMoves = listOfPieces[i]->possibleMoves->next;
-    //     }
-    // }
-    // return 0;
+    int res = -1;
+    int i = 0;
+    int max = 16;
+    if(color>0)
+    {
+        printf("prout\n");
+        i = 16;
+        max = 32;
+
+    }
+    while(i<max && res==-1)
+    {
+        struct piece* p = listOfPieces[i];
+        getMoves(board, p,p->realPlayerColor);
+        printf("\nRole : %i && Color : %i \n",p->role,p->color);
+        while(p->role !=0 && p->possibleMoves!=NULL && res==-1)
+        {
+            printf("%i  ",board[p->possibleMoves->data]->color);
+            if(board[p->possibleMoves->data]->role == KING)
+            {
+                res = i;
+                printf("%i ",res<0);
+            }
+            p->possibleMoves = p->possibleMoves->next;
+        }
+        i++;
+    }
+    return res;
 }
 
 int move(struct piece** board, struct piece* piece, int x, int y, struct piece** listOfPieces)
@@ -517,16 +540,36 @@ int move(struct piece** board, struct piece* piece, int x, int y, struct piece**
     int tmpy = piece->y;
     piece->x = x;
     piece->y = y;
-    // int isCheckIndex = isCheck(board, listOfPieces);
-    // if(listOfPieces[isCheckIndex]->color != piece->color)
-    // {
-    //     board[piece->x+piece->y*8] = piece;
-    //     piece->x = tmpx;
-    //     piece->y = tmpy;
-    //     board[x+y*8]=sw;
-    // }
-
-
+    int isCheckIndex = isCheck(board, listOfPieces, piece->color);
+    printf("%i\n",isCheckIndex);
+    if(isCheck<0)
+    {
+        board[piece->x+piece->y*8] = piece;
+        piece->x = tmpx;
+        piece->y = tmpy;
+        board[x+y*8]=sw;
+        return 0;
+    }
+    if(sw->role)
+    {
+        
+        freePiece(sw);
+        sw->role = EMPTY;
+        sw->color = NONE;
+        sw->value = 0;
+    }
     
     return 1;
+}
+
+void freePiece(struct piece* piece)
+{
+    while(piece->possibleMoves!=NULL)
+    {
+        struct list* tmp = piece->possibleMoves->next;
+        free(piece->possibleMoves);
+        piece->possibleMoves = tmp; 
+    }
+    free(piece->possibleMoves);
+
 }

@@ -36,6 +36,7 @@ struct piece {
     enum Color color;
     int value;
     struct list *possibleMoves;
+    int realPlayerColor;
     int index;
 };
 
