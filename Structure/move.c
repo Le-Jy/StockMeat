@@ -496,7 +496,7 @@ int isCheck(struct piece** board, struct piece** listOfPieces, int color)
     int max = 16;
     if(color>0)
     {
-        printf("prout\n");
+        
         i = 16;
         max = 32;
 
@@ -505,14 +505,15 @@ int isCheck(struct piece** board, struct piece** listOfPieces, int color)
     {
         struct piece* p = listOfPieces[i];
         getMoves(board, p,p->realPlayerColor);
-        printf("\nRole : %i && Color : %i \n",p->role,p->color);
+        printf("\nRole : %i && Color : %i \n",p->role,p->role);
         while(p->role !=0 && p->possibleMoves!=NULL && res==-1)
         {
-            printf("%i  ",board[p->possibleMoves->data]->color);
+            printf("%i  ",board[p->possibleMoves->data]->role);
             if(board[p->possibleMoves->data]->role == KING)
             {
                 res = i;
-                printf("%i ",res<0);
+                printf("%i",res);
+                printf("prout\n");
             }
             p->possibleMoves = p->possibleMoves->next;
         }
@@ -542,13 +543,14 @@ int move(struct piece** board, struct piece* piece, int x, int y, struct piece**
     piece->y = y;
     int isCheckIndex = isCheck(board, listOfPieces, piece->color);
     printf("%i\n",isCheckIndex);
-    if(isCheck<0)
+    if(isCheckIndex>=0)
     {
         board[piece->x+piece->y*8] = piece;
         piece->x = tmpx;
         piece->y = tmpy;
         board[x+y*8]=sw;
         return 0;
+        //y a quelques bugs (le switch fonctionne pas de fou)
     }
     if(sw->role)
     {
