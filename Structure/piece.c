@@ -13,6 +13,7 @@ int list_is_empty(struct list *list)
 
 void newpiece (struct piece *newpiece, int x, int y,enum Color color, int index)
 {
+    newpiece->hasMoved = 0;
     newpiece->x=x;
     newpiece->y=y;
     newpiece->color = color;
@@ -44,13 +45,13 @@ void newpiece (struct piece *newpiece, int x, int y,enum Color color, int index)
         newpiece->index = index;
     }
     
-    else if((y == 0 && x == 3)||(y==7 && x == 4))
+    else if((y == 0 && x == 4)||(y==7 && x == 4))
     {
         newpiece->role = KING;
         newpiece->value = 32767;
         newpiece->index = index;
     }
-    else if((y == 0 && x == 4)||(y==7 && x == 3))
+    else if((y == 0 && x == 3)||(y==7 && x == 3))
     {
         newpiece->role = QUEEN;
         newpiece->value = 9;
@@ -61,5 +62,23 @@ void newpiece (struct piece *newpiece, int x, int y,enum Color color, int index)
         newpiece->role = EMPTY;
         newpiece->value = 0;
     }
+
+}
+
+void freeMoves(struct piece* piece)
+{
+    while(piece->possibleMoves!=NULL)
+    {
+        struct list* tmp = piece->possibleMoves->next;
+        free(piece->possibleMoves);
+        piece->possibleMoves = tmp; 
+    }
+    free(piece->possibleMoves);
+}
+
+void freePiece(struct piece* piece)
+{
+    freeMoves(piece);
+    free(piece);
 
 }

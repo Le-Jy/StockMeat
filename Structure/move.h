@@ -21,4 +21,10 @@ int move(struct piece** board, struct piece* piece, int x , int y, struct piece*
 
 int isCheck(struct piece** board, struct piece** listOfPieces, int color);
 
-void freePiece(struct piece* piece);
+int canShortCastle(struct piece** board,struct piece* piece, struct piece** listOfPieces);
+
+int canLongCastle(struct piece** board, struct piece* piece, struct piece** listOfPieces);
+
+void shortCastle(struct piece** board, struct piece* piece, struct piece** listOfPieces);
+
+void longCastle(struct piece** board, struct piece* piece, struct piece** listOfPieces);

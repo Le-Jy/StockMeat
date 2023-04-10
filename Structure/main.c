@@ -24,42 +24,27 @@ void main()
     struct piece** listOfPieces = malloc(32*sizeof(struct piece));
     struct piece **board = malloc(64*sizeof(struct piece));
     initBoard(board,WHITE,listOfPieces);
-    // for(size_t i = 0;i<32;i++)
-    // {
-    //     printf("%i\n",listOfPieces[i]->color);
-    // }
-    // int p = 1+7*8;
-    int x = 9;
-    
-    // printboard(board);
-    // getMoves(board, board[p], WHITE);
-    // int z = move(board, board[p],0,5,listOfPieces);
-    // printf("\n%i\n",z);
-    // printboard(board);
-    //  getMoves(board, board[x], WHITE);
-    // z = move(board, board[x],1,3,listOfPieces);
-    // printf("\n%i\n",z);
-    // printboard(board);
-    // p = 5*8;
-    // getMoves(board, board[p], WHITE);
-    // z = move(board, board[p],1,3,listOfPieces);
-    // printf("\n%i\n",z);
-    // printboard(board);
-    // for(size_t i = 0;i<32;i++)
-    // {
-    //     printf("%i\n",listOfPieces[i]->role);
-    // }
-    board[3+8]->role = EMPTY;
-    board[3+8]->color = NONE;
-    board[3+8]->value = 0;
-    printf("%i\n",board[3+8]->role);
-    board[3+8*6]->role = EMPTY;
-    board[3+8*6]->color = NONE;
-    board[3+8*6]->value = 0;
+    for(int i=1;i<7;i++)
+    {
+        if(i!=4)
+        {
+            board[i]->role = EMPTY;
+            board[i]->color = NONE;
+            board[i]->value = 0;
+        }    
+    }
+    for(int i=57;i<63;i++)
+    {
+        if(i!=60)
+        {
+            board[i]->role = EMPTY;
+            board[i]->color = NONE;
+            board[i]->value = 0;
+        }    
+    }
+    shortCastle(board,board[4],listOfPieces);
     printboard(board);
-    getMoves(board, board[x], WHITE);
-    int z = move(board, board[x],1,3,listOfPieces);
-    // printf("\n%i\n",z)
-    printboard(board);    
+    freeBoard(board);
+    free(listOfPieces);
         
 }

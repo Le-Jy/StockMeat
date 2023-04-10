@@ -2,7 +2,7 @@
 
 void initBoard(struct piece **board, enum Color colorPlayer, struct piece** listOfPiece)
 {
-    if(colorPlayer==1)
+    if(colorPlayer==BLACK)
     {
         int cpt = 0;
         for (size_t i = 0; i < 2; i++)
@@ -83,4 +83,13 @@ void initBoard(struct piece **board, enum Color colorPlayer, struct piece** list
     }
         
 
+}
+
+void freeBoard(struct piece** board)
+{
+    for(int i = 0; i<64;i++)
+    {
+        freePiece(board[i]);
+    }
+    free(board);
 }

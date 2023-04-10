@@ -38,6 +38,11 @@ struct piece {
     struct list *possibleMoves;
     int realPlayerColor;
     int index;
+    int hasMoved;
 };
 
 void newpiece (struct piece *newpiece,int x,int y,enum Color color,int index);
+
+void freeMoves(struct piece* piece);
+
+void freePiece(struct piece* piece);

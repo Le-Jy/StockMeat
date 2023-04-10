@@ -41,6 +41,7 @@ void getMoves(struct piece** board, struct piece* piece, int playercolor)
 
 void getPawnMoves(struct piece** board, struct piece* piece, int playercolor)
 {
+    freeMoves(piece);
     piece->possibleMoves = NULL;
     if(playercolor == piece->color)
     {
@@ -131,7 +132,10 @@ void getPawnMoves(struct piece** board, struct piece* piece, int playercolor)
 void getBishopMoves(struct piece** board, struct piece* piece)
 {
     if(piece->role!=QUEEN)
+    {
+        freeMoves(piece);
         piece->possibleMoves = NULL;
+    }
     int posLeftDiag = 1;
     int frontRightDiag = 1;
     int negLeftDiag = 1;
@@ -241,6 +245,7 @@ void getBishopMoves(struct piece** board, struct piece* piece)
 
 void getKnightMoves(struct piece** board, struct piece* piece)
 {
+    freeMoves(piece);
     piece->possibleMoves = NULL;
     int move = (piece->x+2)+(piece->y+1)*8;
     if(move<64 && move>-1)
@@ -336,7 +341,10 @@ void getKnightMoves(struct piece** board, struct piece* piece)
 void getRookMoves(struct piece** board, struct piece* piece)
 {
     if(piece->role!=QUEEN)
+    {
+        freeMoves(piece);
         piece->possibleMoves = NULL;
+    }
     int dirNegV = 1;
     int dirPosV = 1;
     int dirNegH = 1;
@@ -418,6 +426,7 @@ void getRookMoves(struct piece** board, struct piece* piece)
 
 void getQueenMoves(struct piece** board, struct piece* piece)
 {
+    freeMoves(piece);
     piece->possibleMoves = NULL;
     getRookMoves(board,piece);
     getBishopMoves(board,piece);
@@ -425,6 +434,7 @@ void getQueenMoves(struct piece** board, struct piece* piece)
 
 void getKingMoves(struct piece** board, struct piece* piece)
 {
+    freeMoves(piece);
     piece->possibleMoves = NULL;
     int vNeg = respectedRangeVertical(board, piece, -1);
     int vPos = respectedRangeVertical(board, piece, 1);
@@ -505,15 +515,12 @@ int isCheck(struct piece** board, struct piece** listOfPieces, int color)
     {
         struct piece* p = listOfPieces[i];
         getMoves(board, p,p->realPlayerColor);
-        printf("\nRole : %i && Color : %i \n",p->role,p->role);
         while(p->role !=0 && p->possibleMoves!=NULL && res==-1)
         {
-            printf("%i  ",board[p->possibleMoves->data]->role);
             if(board[p->possibleMoves->data]->role == KING)
             {
                 res = i;
-                printf("%i",res);
-                printf("prout\n");
+                
             }
             p->possibleMoves = p->possibleMoves->next;
         }
@@ -532,29 +539,26 @@ int move(struct piece** board, struct piece* piece, int x, int y, struct piece**
     }
     if(piece->possibleMoves == NULL)
         return 0;
-    struct piece* sw = board[x+y*8];
-
-    board[piece->x+piece->y*8] = sw;
-    board[x+y*8] = piece;
-
+    struct piece *sw = board[x+y*8];
     int tmpx = piece->x;
     int tmpy = piece->y;
     piece->x = x;
     piece->y = y;
+    sw->x = tmpx;
+    sw->y = tmpy;
+    board[piece->x+piece->y*8] = sw;
+    board[x+y*8] = piece;
     int isCheckIndex = isCheck(board, listOfPieces, piece->color);
-    printf("%i\n",isCheckIndex);
     if(isCheckIndex>=0)
     {
-        board[piece->x+piece->y*8] = piece;
         piece->x = tmpx;
         piece->y = tmpy;
+        board[piece->x+piece->y*8] = piece;
         board[x+y*8]=sw;
         return 0;
-        //y a quelques bugs (le switch fonctionne pas de fou)
     }
     if(sw->role)
     {
-        
         freePiece(sw);
         sw->role = EMPTY;
         sw->color = NONE;
@@ -564,14 +568,119 @@ int move(struct piece** board, struct piece* piece, int x, int y, struct piece**
     return 1;
 }
 
-void freePiece(struct piece* piece)
+int canShortCastle(struct piece** board,struct piece* piece, struct piece** listOfPieces)
 {
-    while(piece->possibleMoves!=NULL)
+    int res = 0;
+    if(!piece->hasMoved && !board[piece->x+3+piece->y*8]->hasMoved && !board[piece->x+piece->y*8+1]->role && !board[piece->x+piece->y*8+2]->role)
     {
-        struct list* tmp = piece->possibleMoves->next;
-        free(piece->possibleMoves);
-        piece->possibleMoves = tmp; 
-    }
-    free(piece->possibleMoves);
+        if(piece->role==KING)
+        {
+            res = 1;
+            int i = 0;
+            int max = 16;
+            if(piece->color==BLACK)
+            {
+                
+                i = 16;
+                max = 32;
 
+            }
+            while(i<max && res==1)
+            {
+                struct piece* p = listOfPieces[i];
+                getMoves(board, p,p->realPlayerColor);
+                while(p->role !=0 && p->possibleMoves!=NULL && res==1)
+                {
+                    if((board[p->possibleMoves->data]->x == piece->x+1 || board[p->possibleMoves->data]->x == piece->x+2) && board[p->possibleMoves->data]->y == piece->y )
+                    {
+                        res = 0; 
+                    }
+                    p->possibleMoves = p->possibleMoves->next;
+                }
+                i++;
+            }
+        }
+        
+    }
+    return res;
+
+}
+
+int canLongCastle(struct piece** board, struct piece* piece, struct piece** listOfPieces)
+{
+    int res = 0;
+    if(!piece->hasMoved && !board[piece->x-4+piece->y*8]->hasMoved && !board[piece->x+piece->y*8-1]->role && !board[piece->x+piece->y*8-2]->role && !board[piece->x+piece->y*8-3]->role)
+    {
+        if(piece->role==KING)
+        {
+            res = 1;
+            int i = 0;
+            int max = 16;
+            if(piece->color==BLACK)
+            {
+                
+                i = 16;
+                max = 32;
+
+            }
+            while(i<max && res==1)
+            {
+                struct piece* p = listOfPieces[i];
+                getMoves(board, p,p->realPlayerColor);
+                while(p->role !=0 && p->possibleMoves!=NULL && res==1)
+                {
+                    if((board[p->possibleMoves->data]->x == piece->x-1 || board[p->possibleMoves->data]->x == piece->x-2 || board[p->possibleMoves->data]->x == piece->x-3) && board[p->possibleMoves->data]->y == piece->y )
+                    {
+                        res = 0;
+                    }
+                    p->possibleMoves = p->possibleMoves->next;
+                }
+                i++;
+            }
+        }
+        
+    }
+    return res;
+}
+
+void shortCastle(struct piece** board, struct piece* piece, struct piece** listOfPieces)
+{
+    if(canShortCastle(board, piece, listOfPieces))
+    {
+        struct piece* sw1 = board[piece->x+2+piece->y*8];
+        struct piece* sw2 = board[piece->x+1+piece->y*8];
+        struct piece* sw3 = board[piece->x+3+piece->y*8];
+        sw1->x = piece->x;
+        piece->x +=2;
+        board[sw1->x+sw1->y*8] = sw1;
+        board[piece->x+piece->y*8] = piece;
+        sw2->x+=2;
+        board[sw2->x+sw2->y*8]=sw2;
+        sw3->x-=3;
+        sw3->hasMoved = 1;
+        board[piece->x-1+piece->y*8] = sw3;
+        piece->hasMoved = 1;
+    }
+
+}
+
+void longCastle(struct piece** board, struct piece* piece, struct piece** listOfPieces)
+{
+    if(canLongCastle(board, piece, listOfPieces))
+    {
+        struct piece* sw1 = board[piece->x-2+piece->y*8];
+        struct piece* sw2 = board[piece->x-1+piece->y*8];
+        struct piece* sw3 = board[piece->x-4+piece->y*8];
+        sw1->x = piece->x;
+        piece->x -=2;
+        board[sw1->x+sw1->y*8] = sw1;
+        board[piece->x+piece->y*8] = piece;
+        sw2->x-=3;
+        board[sw2->x+sw2->y*8]=sw2;
+        sw3->x+=3;
+        sw3->hasMoved = 1;
+        board[piece->x+1+piece->y*8] = sw3;
+        piece->hasMoved = 1;
+    }
+    
 }
