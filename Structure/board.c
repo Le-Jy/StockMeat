@@ -1,6 +1,6 @@
 #include "board.h"
 
-void initBoard(struct piece **board, enum Color colorPlayer, struct piece** listOfPiece)
+void initBoard(struct piece **board, enum Color colorPlayer)
 {
     if(colorPlayer==BLACK)
     {
@@ -13,7 +13,6 @@ void initBoard(struct piece **board, enum Color colorPlayer, struct piece** list
                 newpiece(new,j,i,WHITE,cpt);
                 new->realPlayerColor = colorPlayer;
                 board[i*8+j] = new;
-                listOfPiece[cpt] = new;
                 cpt++;
             }
             
@@ -36,7 +35,6 @@ void initBoard(struct piece **board, enum Color colorPlayer, struct piece** list
                 newpiece(new,j,i,BLACK,cpt);
                 new->realPlayerColor = colorPlayer;
                 board[i*8+j] = new;
-                listOfPiece[cpt] = new;
                 cpt++;
             }
         }
@@ -53,7 +51,7 @@ void initBoard(struct piece **board, enum Color colorPlayer, struct piece** list
                 newpiece(new,j,i,BLACK,cpt);
                 new->realPlayerColor = colorPlayer;
                 board[i*8+j] = new;
-                listOfPiece[cpt] = new;
+               
                 cpt++;
             }
             
@@ -76,7 +74,6 @@ void initBoard(struct piece **board, enum Color colorPlayer, struct piece** list
                 newpiece(new,j,i,WHITE,cpt);
                 new->realPlayerColor = colorPlayer;
                 board[i*8+j] = new;
-                listOfPiece[cpt] = new;
                 cpt++;
             }
         }

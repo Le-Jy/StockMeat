@@ -20,31 +20,16 @@ void printboard(struct piece** board)
 
 void main()
 {
-    
-    struct piece** listOfPieces = malloc(32*sizeof(struct piece));
-    struct piece **board = malloc(64*sizeof(struct piece));
-    initBoard(board,WHITE,listOfPieces);
-    for(int i=1;i<7;i++)
-    {
-        if(i!=4)
-        {
-            board[i]->role = EMPTY;
-            board[i]->color = NONE;
-            board[i]->value = 0;
-        }    
-    }
-    for(int i=57;i<63;i++)
-    {
-        if(i!=60)
-        {
-            board[i]->role = EMPTY;
-            board[i]->color = NONE;
-            board[i]->value = 0;
-        }    
-    }
-    shortCastle(board,board[4],listOfPieces);
+    struct piece** board = malloc(64*sizeof(struct piece));
+    initBoard(board,WHITE);
+    swap(board[0],board[7*8]);
+    promotion(board[0],QUEEN);
+    printf("%i\n",board[0]->color);
     printboard(board);
+    
     freeBoard(board);
-    free(listOfPieces);
+    
+
+
         
 }

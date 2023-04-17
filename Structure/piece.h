@@ -37,7 +37,6 @@ struct piece {
     int value;
     struct list *possibleMoves;
     int realPlayerColor;
-    int index;
     int hasMoved;
 };
 

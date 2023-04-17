@@ -17,14 +17,20 @@ void getQueenMoves(struct piece** board, struct piece* piece);
 
 void getKingMoves(struct piece** board, struct piece* piece);
 
-int move(struct piece** board, struct piece* piece, int x , int y, struct piece** listOfPieces);
+int move(struct piece** board, struct piece* piece, int x , int y);
 
-int isCheck(struct piece** board, struct piece** listOfPieces, int color);
+int isCheck(struct piece** board, int color, int index);
 
-int canShortCastle(struct piece** board,struct piece* piece, struct piece** listOfPieces);
+int canShortCastle(struct piece** board,struct piece* piece);
 
-int canLongCastle(struct piece** board, struct piece* piece, struct piece** listOfPieces);
+int canLongCastle(struct piece** board, struct piece* piece);
 
-void shortCastle(struct piece** board, struct piece* piece, struct piece** listOfPieces);
+void shortCastle(struct piece** board, struct piece* piece);
 
-void longCastle(struct piece** board, struct piece* piece, struct piece** listOfPieces);
+void longCastle(struct piece** board, struct piece* piece);
+
+void promotion(struct piece* piece, int role);
+
+int canPromote(struct piece* piece);
+
+void swap(struct piece *A, struct piece *B);
