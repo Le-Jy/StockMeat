@@ -6,11 +6,6 @@ void list_init(struct list *list)
     list->data=-1;
 }
 
-int list_is_empty(struct list *list)
-{
-    return list->next == NULL;
-}
-
 void newpiece (struct piece *newpiece, int x, int y,enum Color color, int index)
 {
     newpiece->hasMoved = 0;

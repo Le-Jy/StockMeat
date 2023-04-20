@@ -14,12 +14,12 @@ int respectedRangeHorizontal(struct piece** board, struct piece* piece, int i)
     return 0;
 }
 
-void getMoves(struct piece** board, struct piece* piece, int playercolor)
+void getMoves(struct piece** board, struct piece* piece, int realplayercolor)
 {
     switch(piece->role)
     {
         case PAWN:
-            getPawnMoves(board, piece, playercolor);
+            getPawnMoves(board, piece, realplayercolor);
             break;
         case BISHOP:
             getBishopMoves(board,piece);
@@ -57,7 +57,7 @@ void getPawnMoves(struct piece** board, struct piece* piece, int playercolor)
             piece->possibleMoves = newmove;
 
         }
-        if(h && v && board[piece->x-1+(piece->y-1)*8]->color!=playercolor && board[piece->x+1+(piece->y-1)*8]->color!=NONE)//left diag (can eat)
+        if(h && v && board[piece->x-1+(piece->y-1)*8]->color!=piece->color && board[piece->x-1+(piece->y-1)*8]->color!=NONE)//left diag (can eat)
         {
             struct list *newmove = malloc(sizeof(struct list));
             newmove->next = piece->possibleMoves;
@@ -65,7 +65,7 @@ void getPawnMoves(struct piece** board, struct piece* piece, int playercolor)
             piece->possibleMoves = newmove;
         }
         h = respectedRangeHorizontal(board, piece, 1);
-        if(h && v && board[piece->x+1+(piece->y-1)*8]->color!=playercolor && board[piece->x+1+(piece->y-1)*8]->color!=NONE)//right diag (can eat)
+        if(h && v && board[piece->x+1+(piece->y-1)*8]->color!=piece->color && board[piece->x+1+(piece->y-1)*8]->color!=NONE)//right diag (can eat)
         {
             struct list *newmove = malloc(sizeof(struct list));
             newmove->next = piece->possibleMoves;
@@ -89,7 +89,7 @@ void getPawnMoves(struct piece** board, struct piece* piece, int playercolor)
     else
     {
         int v = respectedRangeVertical(board, piece, 1);
-        int h = respectedRangeHorizontal(board, piece, 1);
+        int h = respectedRangeHorizontal(board, piece, -1);
         if(v && board[piece->x+(piece->y+1)*8]->role==EMPTY)//front 1 box
         {
             struct list *newmove = malloc(sizeof(struct list));
@@ -98,15 +98,16 @@ void getPawnMoves(struct piece** board, struct piece* piece, int playercolor)
             piece->possibleMoves = newmove;
 
         }
-        if(h && v && board[piece->x-1+(piece->y+1)*8]->color!=playercolor && board[piece->x+1+(piece->y+1)*8]->color!=NONE)//left diag (can eat)
+        if(h && v && board[piece->x-1+(piece->y+1)*8]->color!=piece->color && board[piece->x-1+(piece->y+1)*8]->color!=NONE)//left diag (can eat)
         {
+            
             struct list *newmove = malloc(sizeof(struct list));
             newmove->next = piece->possibleMoves;
             newmove->data = piece->x-1+(piece->y+1)*8;
             piece->possibleMoves = newmove;
         }
         h = respectedRangeHorizontal(board, piece, 1);
-        if(h && v && board[piece->x+1+(piece->y+1)*8]->color!=playercolor && board[piece->x+1+(piece->y+1)*8]->color!=NONE)//right diag (can eat)
+        if(h && v && board[piece->x+1+(piece->y+1)*8]->color!=piece->color && board[piece->x+1+(piece->y+1)*8]->color!=NONE)//right diag (can eat)
         {
             struct list *newmove = malloc(sizeof(struct list));
             newmove->next = piece->possibleMoves;
@@ -509,7 +510,7 @@ int isCheck(struct piece** board, int colorPlayed, int indexIgnored)
     {
         
         struct piece* p = board[i];
-        if(i!= indexIgnored && board[i]->role && p!= NULL && p->color !=colorPlayed)
+        if(i!= indexIgnored && board[i]->role && p->color !=colorPlayed)
         {
             getMoves(board, p,p->realPlayerColor);
             while(p->role !=0 && p->possibleMoves!=NULL && res==-1)
@@ -536,16 +537,20 @@ int move(struct piece** board, struct piece* piece, int x, int y)
         piece->possibleMoves = piece->possibleMoves->next;
     }
     if(piece->possibleMoves == NULL)
+    {
+        printf("%i\n",0);
         return 0;
+    }
+        
     swap(piece,board[x+y*8]);
     
     int isCheckIndex = isCheck(board, board[x+y*8]->color,x+y*8);
-    
     if(isCheckIndex>=0)
     {
         swap(piece,board[x+y*8]);
         return 0;
     }
+    
     if(piece->role>=1)
     {
         int tmpx = piece->x;
@@ -591,7 +596,7 @@ int canShortCastle(struct piece** board,struct piece* piece)
                 getMoves(board, p,p->realPlayerColor);
                 while(p->role && p->possibleMoves!=NULL && res==1)
                 {
-                    if(p->color != piece->color && (board[p->possibleMoves->data]->x == piece->x+1 || board[p->possibleMoves->data]->x == piece->x+2) && board[p->possibleMoves->data]->y == piece->y )
+                    if(p->color != piece->color && (board[p->possibleMoves->data]->y == piece->y && board[p->possibleMoves->data]->x == piece->x+1 || board[p->possibleMoves->data]->x == piece->x+2))
                     {
                         
                         res = 0; 
@@ -623,7 +628,7 @@ int canLongCastle(struct piece** board, struct piece* piece)
                 getMoves(board, p,p->realPlayerColor);
                 while(p->role !=0 && p->possibleMoves!=NULL && res==1)
                 {
-                    if(p->color != piece->color && (board[p->possibleMoves->data]->x == piece->x-1 || board[p->possibleMoves->data]->x == piece->x-2 || board[p->possibleMoves->data]->x == piece->x-3) && board[p->possibleMoves->data]->y == piece->y )
+                    if(p->color != piece->color && (board[p->possibleMoves->data]->y == piece->y && board[p->possibleMoves->data]->x == piece->x-1 || board[p->possibleMoves->data]->x == piece->x-2 || board[p->possibleMoves->data]->x == piece->x-3))
                     {
                         res = 0;
                     }
@@ -698,6 +703,73 @@ int canPromote(struct piece* piece)
     if(piece->role == 1 && piece->color != piece->realPlayerColor && piece->y==7)
     {
         return 1;
+    }
+    return 0;
+}
+
+int checkMate(struct piece** board,int KingColor)
+{
+    int check = 1;
+    for(int i = 0;check == 1 && i<63;i++)
+    {
+        if(board[i]->role == KING && board[i]->color == KingColor)
+        {
+            getMoves(board,board[i],board[i]->realPlayerColor);
+            int Kingx = board[i]->x;
+            int Kingy = board[i]->y;
+            int dangerousmoves[8];
+            int cpt = 0;
+            while(board[i]->possibleMoves != NULL && check == 1)
+            {
+                int x = (board[i]->possibleMoves->data)%8;
+                int y = (board[i]->possibleMoves->data-x)/8;
+                int moved = move(board,board[i],x,y);
+                if(moved)
+                {
+                    move(board,board[x+y*8],Kingx,Kingy);
+                    check = 0;
+                }
+                else
+                {
+                    dangerousmoves[cpt] = board[i]->possibleMoves->data;
+                    board[i]->possibleMoves = board[i]->possibleMoves->next;
+                    cpt+=1;
+                }
+                
+            }
+            if(board[i]->possibleMoves == NULL)
+                return cannotProtectKing(board,dangerousmoves,KingColor,cpt);
+        }
+       
+    }
+    return check;
+}
+
+int cannotProtectKing(struct piece** board,int dangerousmoves[8], int KingColor, int cpt)
+{
+    for(int i = 0;i<63;i++)
+    {
+        if(board[i]->color == KingColor && board[i]->role != KING)
+        {
+            struct piece* p = board[i];
+            getMoves(board,p,p->realPlayerColor);
+            while(p->possibleMoves != NULL)
+            {
+                for(int j = 0; j<cpt; j++)
+                {
+                    if(p->possibleMoves->data == dangerousmoves[j])
+                    {
+                        dangerousmoves[j] = -1;          
+                    }          
+                }
+                p->possibleMoves = p->possibleMoves->next;
+            }
+        }
+    }
+    for(int i=0;i<cpt;i++)
+    {
+        if(dangerousmoves[i]!=-1)
+            return 1;
     }
     return 0;
 }

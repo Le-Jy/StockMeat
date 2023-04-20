@@ -22,6 +22,7 @@ enum Role {
     QUEEN = 5,
     KING = 6
 };
+
 enum Color{
     BLACK = 1,
     WHITE = -1,
