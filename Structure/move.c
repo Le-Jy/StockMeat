@@ -501,7 +501,7 @@ void getKingMoves(struct piece** board, struct piece* piece)
     }
 }
 
-int isCheck(struct piece** board, int colorPlayed, int indexIgnored)
+int isCheck(struct piece** board, int colorPlayed, int indexIgnored, int indexIgnored2)
 {
     int res = -1;
     int i = 0;
@@ -510,7 +510,7 @@ int isCheck(struct piece** board, int colorPlayed, int indexIgnored)
     {
         
         struct piece* p = board[i];
-        if(i!= indexIgnored && board[i]->role && p->color !=colorPlayed)
+        if(i!= indexIgnored && i!=indexIgnored2 && board[i]->role && p->color !=colorPlayed)
         {
             getMoves(board, p,p->realPlayerColor);
             while(p->role !=0 && p->possibleMoves!=NULL && res==-1)
@@ -538,13 +538,12 @@ int move(struct piece** board, struct piece* piece, int x, int y)
     }
     if(piece->possibleMoves == NULL)
     {
-        printf("%i\n",0);
         return 0;
     }
         
     swap(piece,board[x+y*8]);
     
-    int isCheckIndex = isCheck(board, board[x+y*8]->color,x+y*8);
+    int isCheckIndex = isCheck(board, board[x+y*8]->color,x+y*8,piece->x+piece->y*8);
     if(isCheckIndex>=0)
     {
         swap(piece,board[x+y*8]);
@@ -723,9 +722,11 @@ int checkMate(struct piece** board,int KingColor)
             {
                 int x = (board[i]->possibleMoves->data)%8;
                 int y = (board[i]->possibleMoves->data-x)/8;
+                // printf("x : %i, y : %i\n",x,y);
                 int moved = move(board,board[i],x,y);
                 if(moved)
                 {
+                    printf("test\n");
                     move(board,board[x+y*8],Kingx,Kingy);
                     check = 0;
                 }
@@ -737,7 +738,7 @@ int checkMate(struct piece** board,int KingColor)
                 }
                 
             }
-            if(board[i]->possibleMoves == NULL)
+            if(check)
                 return cannotProtectKing(board,dangerousmoves,KingColor,cpt);
         }
        

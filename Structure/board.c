@@ -82,6 +82,20 @@ void initBoard(struct piece **board, enum Color colorPlayer)
 
 }
 
+void printboard(struct piece** board)
+{
+     printf("------------------------\n");
+    int c = 1;
+    for(int j = 0;j<64;j++,c++)
+    {
+        printf(" %i ",board[j]->role);
+        if(c%8==0)
+        {
+            printf("\n");
+        }
+    }
+}
+
 void freeBoard(struct piece** board)
 {
     for(int i = 0; i<64;i++)
