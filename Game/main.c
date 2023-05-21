@@ -1,0 +1,82 @@
+#include "game.h"
+
+void main()
+{
+    
+    struct piece** board = malloc(64*sizeof(struct piece));
+    int checkMatevalue = 0;
+    int check = 0;
+    unsigned long turn = 0;
+    initParty(board, WHITE);
+    int x,y,xx,yy;
+
+    while(checkMatevalue == 0)
+    {
+        printboard(board);
+        printColorTurn(turn);
+        int hasmoved = 0;
+        while(hasmoved == 0)
+        {
+            int* coord = choosePiece();
+            while(isValidPiece(coord, board, turn) == 0)
+            {
+                printf("Please, select your color !\n");
+                coord = choosePiece();
+            }
+            x = coord[0];
+            y = coord[1];
+            int* coord2 = chooseDest();
+            xx = coord2[0];
+            yy = coord2[1];
+            if(move(board,board[x + y*8],xx,yy))
+                hasmoved = 1;
+            else if(board[x+8*y]->role == KING && board[xx+yy*8]->role == ROOK)
+            {
+                if(yy>y && canShortCastle(board,board[x+8*y]))
+                {
+                    shortCastle(board,board[x+8*y]);
+                    hasmoved = 1;
+                }
+                if(yy<y && canLongCastle(board,board[x+8*y]))
+                {
+                    longCastle(board,board[x+8*y]);
+                    hasmoved = 1;
+                }
+                else
+                {
+                    printf("You can't castle\n");
+                }
+
+            }
+            else
+                printf("Invalid move, please retry\n");
+            free(coord);
+            free(coord2);
+        }
+        if(canPromote(board[xx+yy*y]))
+        {
+            printf("Please promote your pawn\n");
+            printf("Bishop : 2\nKnight : 3\nRook : 4\nQueen : 5\n");
+            int pr;
+            scanf("%d",&pr);
+            while(pr <2 && pr>5)
+            {
+                printf("Please promote your pawn\n");
+                printf("Bishop : 2\nKnight : 3\nRook : 4\nQueen : 5\n");
+                scanf("%d",&pr);
+            }
+        }
+        if(checkMate(board,WHITE))
+            checkMatevalue = WHITE;
+        if(checkMate(board,BLACK))
+            checkMatevalue = BLACK;
+        turn++;
+    }
+    printboard(board);
+    if(checkMatevalue == WHITE)
+        printf("Black won!\n");
+    else
+        printf("White won!\n");
+    freeBoard(board);
+    return;
+}

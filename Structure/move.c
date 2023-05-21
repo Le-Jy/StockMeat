@@ -669,27 +669,24 @@ void longCastle(struct piece** board, struct piece* piece)
 
 void promotion(struct piece* piece, int role)
 {
-    if(canPromote(piece))
+    switch(role)
     {
-        switch(role)
-        {
-            case(QUEEN):
-                piece->role = QUEEN;
-                piece->value = 9;
-                break;
-            case(ROOK):
-                piece->role = ROOK;
-                piece->value = 5;
-                break;
-            case(BISHOP):
-                piece->role = BISHOP;
-                piece->value = 3;
-                break;
-            case(KNIGHT):
-                piece->role = KNIGHT;
-                piece->value = 3;
-                break;
-        }
+        case(QUEEN):
+            piece->role = QUEEN;
+            piece->value = 9;
+            break;
+        case(ROOK):
+            piece->role = ROOK;
+            piece->value = 5;
+            break;
+        case(BISHOP):
+            piece->role = BISHOP;
+            piece->value = 3;
+            break;
+        case(KNIGHT):
+            piece->role = KNIGHT;
+            piece->value = 3;
+            break;
     }
 }
 
@@ -722,11 +719,9 @@ int checkMate(struct piece** board,int KingColor)
             {
                 int x = (board[i]->possibleMoves->data)%8;
                 int y = (board[i]->possibleMoves->data-x)/8;
-                // printf("x : %i, y : %i\n",x,y);
                 int moved = move(board,board[i],x,y);
                 if(moved)
                 {
-                    printf("test\n");
                     move(board,board[x+y*8],Kingx,Kingy);
                     check = 0;
                 }
