@@ -131,7 +131,11 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                         //     checkMatevalue = WHITE;
                         // if(checkMate(board,BLACK))
                         //     checkMatevalue = BLACK;
-                        turn++;
+                        if(hasmoved == 1)
+                        {
+                            turn++;
+                            hasmoved=0;
+                        }    
 
 
                         x = -1;
