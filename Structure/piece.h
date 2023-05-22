@@ -41,7 +41,7 @@ struct piece {
     int hasMoved;
 };
 
-void newpiece (struct piece *newpiece,int x,int y,enum Color color,int index);
+void newpiece (struct piece *newpiece,int x,int y,enum Color color);
 
 void freeMoves(struct piece* piece);
 

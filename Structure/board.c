@@ -4,16 +4,15 @@ void initBoard(struct piece **board, enum Color colorPlayer)
 {
     if(colorPlayer==BLACK)
     {
-        int cpt = 0;
+        
         for (size_t i = 0; i < 2; i++)
         {
             for (size_t j = 0; j < 8; j++)
             {
                 struct piece *new = malloc(sizeof(struct piece));
-                newpiece(new,j,i,WHITE,cpt);
+                newpiece(new,j,i,WHITE);
                 new->realPlayerColor = colorPlayer;
                 board[i*8+j] = new;
-                cpt++;
             }
             
         }
@@ -22,7 +21,7 @@ void initBoard(struct piece **board, enum Color colorPlayer)
             for (size_t j = 0; j < 8; j++)
             {
                 struct piece *new = malloc(sizeof(struct piece));
-                newpiece(new,j,i,NONE,0);
+                newpiece(new,j,i,NONE);
                 board[i*8+j] = new;
             }
             
@@ -32,27 +31,23 @@ void initBoard(struct piece **board, enum Color colorPlayer)
             for (size_t j = 0; j < 8; j++)
             {
                 struct piece *new = malloc(sizeof(struct piece));
-                newpiece(new,j,i,BLACK,cpt);
+                newpiece(new,j,i,BLACK);
                 new->realPlayerColor = colorPlayer;
                 board[i*8+j] = new;
-                cpt++;
             }
         }
         
     }
     else
     {
-        int cpt = 0;
         for (size_t i = 0; i < 2; i++)
         {
             for (size_t j = 0; j < 8; j++)
             {
                 struct piece *new = malloc(sizeof(struct piece));
-                newpiece(new,j,i,BLACK,cpt);
+                newpiece(new,j,i,BLACK);
                 new->realPlayerColor = colorPlayer;
                 board[i*8+j] = new;
-               
-                cpt++;
             }
             
         }
@@ -61,7 +56,7 @@ void initBoard(struct piece **board, enum Color colorPlayer)
             for (size_t j = 0; j < 8; j++)
             {
                 struct piece *new = malloc(sizeof(struct piece));
-                newpiece(new,j,i,NONE,0);
+                newpiece(new,j,i,NONE);
                 board[i*8+j] = new;
             }
             
@@ -71,10 +66,9 @@ void initBoard(struct piece **board, enum Color colorPlayer)
             for (size_t j = 0; j < 8; j++)
             {
                 struct piece *new = malloc(sizeof(struct piece));
-                newpiece(new,j,i,WHITE,cpt);
+                newpiece(new,j,i,WHITE);
                 new->realPlayerColor = colorPlayer;
                 board[i*8+j] = new;
-                cpt++;
             }
         }
     }

@@ -1,13 +1,13 @@
 #include "move.h"
 
-int respectedRangeVertical(struct piece** board, struct piece* piece, int i)
+int respectedRangeVertical(struct piece* piece, int i)
 {
     if(piece->y+i<8 && piece->y+i>-1)
         return 1;
     return 0;
 }
 
-int respectedRangeHorizontal(struct piece** board, struct piece* piece, int i)
+int respectedRangeHorizontal(struct piece* piece, int i)
 {
     if(piece->x+i<8 && piece->x+i>-1)
         return 1;
@@ -36,6 +36,8 @@ void getMoves(struct piece** board, struct piece* piece)
         case KING:
             getKingMoves(board,piece);
             break;
+        default :
+            break;
     }
     
 }
@@ -47,8 +49,8 @@ void getPawnMoves(struct piece** board, struct piece* piece)
     if(piece->realPlayerColor == piece->color)
     {
                 
-        int v = respectedRangeVertical(board, piece, -1);
-        int h = respectedRangeHorizontal(board, piece, -1);
+        int v = respectedRangeVertical(piece, -1);
+        int h = respectedRangeHorizontal(piece, -1);
         if(v && board[piece->x+(piece->y-1)*8]->role==EMPTY)//front 1 box
         {
             struct list *newmove = malloc(sizeof(struct list));
@@ -66,7 +68,7 @@ void getPawnMoves(struct piece** board, struct piece* piece)
             piece->possibleMoves = newmove;
             printf("%i\n",newmove->data);
         }
-        h = respectedRangeHorizontal(board, piece, 1);
+        h = respectedRangeHorizontal(piece, 1);
         if(h && v && board[piece->x+1+(piece->y-1)*8]->color!=piece->color && board[piece->x+1+(piece->y-1)*8]->color!=NONE)//right diag (can eat)
         {
             struct list *newmove = malloc(sizeof(struct list));
@@ -79,7 +81,7 @@ void getPawnMoves(struct piece** board, struct piece* piece)
         }
         if(piece->y==6)
         {
-            int v = respectedRangeVertical(board, piece, -2);
+            int v = respectedRangeVertical(piece, -2);
             if(v && board[piece->x+(piece->y-2)*8]->role==EMPTY)//front 2 boxes
             {
                 struct list *newmove = malloc(sizeof(struct list));
@@ -93,8 +95,8 @@ void getPawnMoves(struct piece** board, struct piece* piece)
     }
     else
     {
-        int v = respectedRangeVertical(board, piece, 1);
-        int h = respectedRangeHorizontal(board, piece, -1);
+        int v = respectedRangeVertical(piece, 1);
+        int h = respectedRangeHorizontal(piece, -1);
         if(v && board[piece->x+(piece->y+1)*8]->role==EMPTY)//front 1 box
         {
             struct list *newmove = malloc(sizeof(struct list));
@@ -111,7 +113,7 @@ void getPawnMoves(struct piece** board, struct piece* piece)
             newmove->data = piece->x-1+(piece->y+1)*8;
             piece->possibleMoves = newmove;
         }
-        h = respectedRangeHorizontal(board, piece, 1);
+        h = respectedRangeHorizontal(piece, 1);
         if(h && v && board[piece->x+1+(piece->y+1)*8]->color!=piece->color && board[piece->x+1+(piece->y+1)*8]->color!=NONE)//right diag (can eat)
         {
             struct list *newmove = malloc(sizeof(struct list));
@@ -122,7 +124,7 @@ void getPawnMoves(struct piece** board, struct piece* piece)
         }
         if(piece->y==1)
         {
-            int v = respectedRangeVertical(board, piece, 2);
+            int v = respectedRangeVertical(piece, 2);
             if(v && board[piece->x+(piece->y+2)*8]->role==EMPTY)//front 2 boxes
             {
                 struct list *newmove = malloc(sizeof(struct list));
@@ -150,8 +152,8 @@ void getBishopMoves(struct piece** board, struct piece* piece)
     int c = 1;
     for(int i=piece->x-1;(posLeftDiag || negLeftDiag) && i>=0;i--)//left diag both direction
     {
-        int vpos = respectedRangeVertical(board, piece, c);
-        int vneg = respectedRangeVertical(board, piece, -c);
+        int vpos = respectedRangeVertical(piece, c);
+        int vneg = respectedRangeVertical(piece, -c);
         if(!vneg || (vneg && board[(i)+(piece->y-c)*8]->color==piece->color))
         {
             posLeftDiag = 0;
@@ -200,8 +202,8 @@ void getBishopMoves(struct piece** board, struct piece* piece)
     c = 1;
     for(size_t i = piece->x+1;(frontRightDiag || backRightDiag) && i<8;i++)//Right diag both direction
     {
-        int vpos = respectedRangeVertical(board, piece, c);
-        int vneg = respectedRangeVertical(board, piece, -c);
+        int vpos = respectedRangeVertical(piece, c);
+        int vneg = respectedRangeVertical(piece, -c);
         if(!vpos || (vpos && board[(i)+(piece->y+c)*8]->color==piece->color))
         {
             frontRightDiag = 0;
@@ -357,10 +359,10 @@ void getRookMoves(struct piece** board, struct piece* piece)
     int dirNegH = 1;
     int dirPosH = 1;
     int i = 1;
-    int negV = respectedRangeVertical(board,piece,-i);
-    int posV = respectedRangeVertical(board,piece,i);
-    int negH = respectedRangeHorizontal(board,piece,-i);
-    int posH = respectedRangeHorizontal(board,piece,i);
+    int negV = respectedRangeVertical(piece,-i);
+    int posV = respectedRangeVertical(piece,i);
+    int negH = respectedRangeHorizontal(piece,-i);
+    int posH = respectedRangeHorizontal(piece,i);
     while((dirNegH || dirNegV || dirPosH || dirPosV) && i<8)
     {
         if(dirNegV && negV)
@@ -421,13 +423,13 @@ void getRookMoves(struct piece** board, struct piece* piece)
         }
         i++;
         if(dirNegV && negV)
-            negV = respectedRangeVertical(board,piece,-i);
+            negV = respectedRangeVertical(piece,-i);
         if(dirPosV && posV)
-            posV = respectedRangeVertical(board,piece,i);
+            posV = respectedRangeVertical(piece,i);
         if(dirNegH && negH)
-            negH = respectedRangeHorizontal(board,piece,-i);
+            negH = respectedRangeHorizontal(piece,-i);
         if(dirPosH && posH)
-            posH = respectedRangeHorizontal(board,piece,i);
+            posH = respectedRangeHorizontal(piece,i);
     }
 }
 
@@ -443,10 +445,10 @@ void getKingMoves(struct piece** board, struct piece* piece)
 {
     freeMoves(piece);
     piece->possibleMoves = NULL;
-    int vNeg = respectedRangeVertical(board, piece, -1);
-    int vPos = respectedRangeVertical(board, piece, 1);
-    int hNeg = respectedRangeHorizontal(board, piece, -1);
-    int hPos = respectedRangeHorizontal(board, piece, 1);
+    int vNeg = respectedRangeVertical(piece, -1);
+    int vPos = respectedRangeVertical(piece, 1);
+    int hNeg = respectedRangeHorizontal(piece, -1);
+    int hPos = respectedRangeHorizontal(piece, 1);
     if(vNeg && board[piece->x+(piece->y-1)*8]->color != piece->color)
     {
         struct list* newmove = malloc(sizeof(struct list));
@@ -603,7 +605,7 @@ int canShortCastle(struct piece** board,struct piece* piece)
                 getMoves(board, p);
                 while(p->role && p->possibleMoves!=NULL && res==1)
                 {
-                    if(p->color != piece->color && (board[p->possibleMoves->data]->y == piece->y && board[p->possibleMoves->data]->x == piece->x+1 || board[p->possibleMoves->data]->x == piece->x+2))
+                    if(p->color != piece->color && ((board[p->possibleMoves->data]->y == piece->y && board[p->possibleMoves->data]->x == piece->x+1) || board[p->possibleMoves->data]->x == piece->x+2))
                     {
                         
                         res = 0; 
@@ -635,7 +637,7 @@ int canLongCastle(struct piece** board, struct piece* piece)
                 getMoves(board, p);
                 while(p->role !=0 && p->possibleMoves!=NULL && res==1)
                 {
-                    if(p->color != piece->color && (board[p->possibleMoves->data]->y == piece->y && board[p->possibleMoves->data]->x == piece->x-1 || board[p->possibleMoves->data]->x == piece->x-2 || board[p->possibleMoves->data]->x == piece->x-3))
+                    if(p->color != piece->color && ((board[p->possibleMoves->data]->y == piece->y && board[p->possibleMoves->data]->x == piece->x-1) || board[p->possibleMoves->data]->x == piece->x-2 || board[p->possibleMoves->data]->x == piece->x-3))
                     {
                         res = 0;
                     }

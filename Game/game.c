@@ -16,23 +16,45 @@ void printColorTurn(unsigned long turn)
 
 int* choosePiece()
 {
+    int err;
     printf("Choose a piece to move\n");
     int* line = malloc(2*sizeof(int));
     printf("x:");
-    scanf("%d",&line[0]);
+    err = scanf("%d",&line[0]);
+    while(err>1)
+    {
+        printf("x:");
+        err = scanf("%d",&line[0]);
+    }
     printf("y:");
-    scanf("%d",&line[1]);
+    err = scanf("%d",&line[1]);
+    while(err>1)
+    {
+        printf("y:");
+        err = scanf("%d",&line[0]);
+    }
     return line;
 }
 
 int* chooseDest()
 {
+    int err;
     printf("Choose a destination\n");
     int* line = malloc(2*sizeof(int));
     printf("x:");
-    scanf("%d",&line[0]);
+    err = scanf("%d",&line[0]);
+    while(err>1)
+    {
+        printf("x:");
+        err = scanf("%d",&line[0]);
+    }
     printf("y:");
-    scanf("%d",&line[1]);
+    err = scanf("%d",&line[1]);
+    while(err>1)
+    {
+        printf("y:");
+        err = scanf("%d",&line[0]);
+    }
     return line;
 }
 

@@ -6,7 +6,7 @@ void list_init(struct list *list)
     list->data=-1;
 }
 
-void newpiece (struct piece *newpiece, int x, int y,enum Color color, int index)
+void newpiece (struct piece *newpiece, int x, int y,enum Color color)
 {
     newpiece->hasMoved = 0;
     newpiece->x=x;
