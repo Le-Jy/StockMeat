@@ -69,18 +69,14 @@ void main()
                 scanf("%d",&pr);
             }
         }
-        if(isCheckinG(board,coord[0],coord[1]))
+        if(isCheckinG(board,xx,yy))
         {
-            if(checkMate(board,board[coord[0]+coord[0]*8]->color,coord[0],coord[0]))
-                checkMatevalue = board[coord[0]+coord[0]*8]->color;
+            if(checkMate(board,board[xx+yy*8]->color,xx,yy))
+                checkMatevalue = board[xx+yy*8]->color;
         }
         turn++;
     }
     printboard(board);
-    if(checkMatevalue == WHITE)
-        printf("White won!\n");
-    else
-        printf("Black won!\n");
     freeBoard(board);
     return;
 }

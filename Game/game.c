@@ -47,13 +47,9 @@ int isValidPiece(int* coord, struct piece** board, int turn)
 
 int isCheckinG(struct piece** board, int x, int y)
 {
-    getMoves(board,board[x+y*8],board[x+y*8]->realPlayerColor);
-    
-    printf("test\n");
-    while(board[x+y*8]->possibleMoves!=NULL)
+    getMoves(board,board[x+y*8]);
+    while(board[x+y*8]->possibleMoves != NULL)
     {
-        
-        printf("role : %i\n",board[x+y*8]->possibleMoves->data);
         if(board[board[x+y*8]->possibleMoves->data]->role == KING && board[board[x+y*8]->possibleMoves->data]->color != board[x+y*8]->color)
         {
             return 1;

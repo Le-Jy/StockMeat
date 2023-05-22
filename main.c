@@ -7,6 +7,7 @@ GtkWidget *fixed2;
 GtkWidget* window;
 size_t win = 0;
 
+int hasmoved;
 struct piece** board;
 int checkMatevalue;
 int check;
@@ -99,7 +100,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                             if(move(board,board[bx + by*8],bxx,byy))
                             {
                                
-                                // hasmoved = 1;
+                                hasmoved = 1;
                                 toMove = widget;
                                 printf("%f\n", floor(dest_x));
                                 gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
@@ -112,12 +113,12 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                                     toMove = widget;
                                     printf("%f\n", floor(dest_x));
                                     gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
-                                    // hasmoved = 1;
+                                    hasmoved = 1;
                                 }
                                 if(byy<by && canLongCastle(board,board[bx+8*by]))
                                 {
                                     longCastle(board,board[bx+8*by]);
-                                    // hasmoved = 1;
+                                    hasmoved = 1;
                                     toMove = widget;
                                     printf("%f\n", floor(dest_x));
                                     gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
@@ -371,6 +372,7 @@ int main(int argc, char *argv[] )
     checkMatevalue = 0;
     check = 0;
     turn = 0;
+    hasmoved = 0;
     initParty(board, WHITE);
 
     

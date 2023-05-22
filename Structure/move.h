@@ -3,9 +3,9 @@
 
 
 
-void getMoves(struct piece** board, struct piece* piece, int playercolor);
+void getMoves(struct piece** board, struct piece* piece);
 
-void getPawnMoves(struct piece** board, struct piece* piece, int playercolor);
+void getPawnMoves(struct piece** board, struct piece* piece);
 
 void getBishopMoves(struct piece** board, struct piece* piece);
 
