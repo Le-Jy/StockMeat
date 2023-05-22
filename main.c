@@ -7,11 +7,10 @@ GtkWidget *fixed2;
 GtkWidget* window;
 size_t win = 0;
 
-struct piece** board = malloc(64*sizeof(struct piece));
-int checkMatevalue = 0;
-int check = 0;
-unsigned long turn = 0;
-initParty(board, WHITE);
+struct piece** board;
+int checkMatevalue;
+int check;
+unsigned long turn;
 int bx,by,bxx,byy;
 
 gint x = -1;
@@ -92,17 +91,46 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                         bxx = floor(dest_x/100);
                         byy = floor(dest_y/100);
 
-                        printf("x: %i, y: %i \n", bx, by);
-                        printf("dx: %i, dy: %i \n", bxx, byy);
-
                         found = 1;
+                        printf("test");
+                        if((turn%2 == 0 && board[bx + 8*by]->color == WHITE) || (turn%2 == 1 && board[bx + 8*by]->color == BLACK))
+                        {
+                            
+                            if(move(board,board[bx + by*8],bxx,byy))
+                            {
+                               
+                                // hasmoved = 1;
+                                toMove = widget;
+                                printf("%f\n", floor(dest_x));
+                                gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
+                            }
+                            else if(board[bx+8*by]->role == KING && board[bxx+byy*8]->role == ROOK)
+                            {
+                                if(byy>by && canShortCastle(board,board[bx+8*by]))
+                                {
+                                    shortCastle(board,board[bx+8*by]);
+                                    toMove = widget;
+                                    printf("%f\n", floor(dest_x));
+                                    gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
+                                    // hasmoved = 1;
+                                }
+                                if(byy<by && canLongCastle(board,board[bx+8*by]))
+                                {
+                                    longCastle(board,board[bx+8*by]);
+                                    // hasmoved = 1;
+                                    toMove = widget;
+                                    printf("%f\n", floor(dest_x));
+                                    gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
+                                }
 
-                        // SI c'est bon tu fais ça 
-                        toMove = widget;
-                        printf("%f\n", floor(dest_x));
-                        gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
-
+                            }
+                        }
                         // checker si y a etc
+                        // if(checkMate(board,WHITE))
+                        //     checkMatevalue = WHITE;
+                        // if(checkMate(board,BLACK))
+                        //     checkMatevalue = BLACK;
+                        turn++;
 
 
                         x = -1;
@@ -338,6 +366,12 @@ void set_image()
 int main(int argc, char *argv[] )
 {
 	gtk_init (&argc, &argv);
+
+    board = malloc(64*sizeof(struct piece));
+    checkMatevalue = 0;
+    check = 0;
+    turn = 0;
+    initParty(board, WHITE);
 
     
 

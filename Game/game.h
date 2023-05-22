@@ -11,3 +11,5 @@ int* choosePiece();
 int* chooseDest();
 
 int isValidPiece(int* coord, struct piece** board, int turn);
+
+int isCheckinG(struct piece** board, int x, int y);

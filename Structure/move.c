@@ -703,7 +703,7 @@ int canPromote(struct piece* piece)
     return 0;
 }
 
-int checkMate(struct piece** board,int KingColor)
+int checkMate(struct piece** board,int KingColor,int x,int y)
 {
     int check = 1;
     for(int i = 0;check == 1 && i<63;i++)
@@ -734,14 +734,14 @@ int checkMate(struct piece** board,int KingColor)
                 
             }
             if(check)
-                return cannotProtectKing(board,dangerousmoves,KingColor,cpt);
+                return cannotProtectKing(board,dangerousmoves,KingColor,cpt,x,y);
         }
        
     }
     return check;
 }
 
-int cannotProtectKing(struct piece** board,int dangerousmoves[8], int KingColor, int cpt)
+int cannotProtectKing(struct piece** board,int dangerousmoves[8], int KingColor, int cpt, int x, int y)
 {
     for(int i = 0;i<63;i++)
     {
@@ -753,10 +753,13 @@ int cannotProtectKing(struct piece** board,int dangerousmoves[8], int KingColor,
             {
                 for(int j = 0; j<cpt; j++)
                 {
-                    if(p->possibleMoves->data == dangerousmoves[j])
+                    for(int k = 0; dangerousmoves[j]+k<=x+y*8;k+=8)
                     {
-                        dangerousmoves[j] = -1;          
-                    }          
+                        if(p->possibleMoves->data == dangerousmoves[j]+k)
+                        {
+                            dangerousmoves[j] = -1;          
+                        }  
+                    }        
                 }
                 p->possibleMoves = p->possibleMoves->next;
             }

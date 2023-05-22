@@ -35,6 +35,6 @@ int canPromote(struct piece* piece);
 
 void swap(struct piece *A, struct piece *B);
 
-int checkMate(struct piece** board,int KingColor);
+int checkMate(struct piece** board,int KingColor, int x, int y);
 
-int cannotProtectKing(struct piece** board,int dangerousmoves[8], int KingColor, int cpt);
+int cannotProtectKing(struct piece** board,int dangerousmoves[8], int KingColor, int cpt, int x, int y);

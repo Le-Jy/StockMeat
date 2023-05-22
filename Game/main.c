@@ -7,6 +7,7 @@ void main()
     int checkMatevalue = 0;
     int check = 0;
     unsigned long turn = 0;
+    int* coord = NULL;
     initParty(board, WHITE);
     int x,y,xx,yy;
 
@@ -17,7 +18,7 @@ void main()
         int hasmoved = 0;
         while(hasmoved == 0)
         {
-            int* coord = choosePiece();
+            coord = choosePiece();
             while(isValidPiece(coord, board, turn) == 0)
             {
                 printf("Please, select your color !\n");
@@ -49,9 +50,11 @@ void main()
 
             }
             else
+            {
                 printf("Invalid move, please retry\n");
-            free(coord);
-            free(coord2);
+                free(coord);
+                free(coord2);
+            }
         }
         if(canPromote(board[xx+yy*y]))
         {
@@ -66,17 +69,18 @@ void main()
                 scanf("%d",&pr);
             }
         }
-        if(checkMate(board,WHITE))
-            checkMatevalue = WHITE;
-        if(checkMate(board,BLACK))
-            checkMatevalue = BLACK;
+        if(isCheckinG(board,coord[0],coord[1]))
+        {
+            if(checkMate(board,board[coord[0]+coord[0]*8]->color,coord[0],coord[0]))
+                checkMatevalue = board[coord[0]+coord[0]*8]->color;
+        }
         turn++;
     }
     printboard(board);
     if(checkMatevalue == WHITE)
-        printf("Black won!\n");
-    else
         printf("White won!\n");
+    else
+        printf("Black won!\n");
     freeBoard(board);
     return;
 }
