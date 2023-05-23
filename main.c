@@ -160,11 +160,6 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
 
                             }
                         }
-                        // checker si y a etc
-                        // if(checkMate(board,WHITE))
-                        //     checkMatevalue = WHITE;
-                        // if(checkMate(board,BLACK))
-                        //     checkMatevalue = BLACK;
                         if(hasmoved == 1)
                         {
                             turn++;
@@ -176,6 +171,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                                 {
                                     printf("FINIS\n");
                                     //return board[bxx+byy*8]->color;
+                                    return TRUE;
                                 }
                             }
                         }    

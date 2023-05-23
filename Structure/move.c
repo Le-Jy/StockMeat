@@ -731,10 +731,31 @@ int checkMate(struct piece** board,int KingColor,int x,int y)
             {
                 int x = (board[i]->possibleMoves->data)%8;
                 int y = (board[i]->possibleMoves->data-x)/8;
+                struct piece* tmp = malloc(sizeof(struct piece));
+                tmp->color = board[x+y*8]->color;
+                tmp->hasMoved = board[x+y*8]->hasMoved;
+                tmp->realPlayerColor = board[x+y*8]->realPlayerColor;
+                tmp->role = board[x+y*8]->role;
+                tmp->value = board[x+y*8]->value;
+                tmp->x = x;
+                tmp->y = y;
+                tmp->possibleMoves = NULL;
+                int hm = 0;
+                if(board[i]->hasMoved)
+                    hm = 1;
                 int moved = move(board,board[i],x,y);
                 if(moved)
                 {
+                    board[i]->hasMoved = hm;
                     move(board,board[x+y*8],Kingx,Kingy);
+                    board[x+y*8]->color = tmp->color;
+                    board[x+y*8]->hasMoved = tmp->hasMoved;
+                    board[x+y*8]->realPlayerColor = tmp->realPlayerColor;
+                    board[x+y*8]->role = tmp->role;
+                    board[x+y*8]->value = tmp->value;
+                    board[x+y*8]->x = x;
+                    board[x+y*8]->y = y;
+                    freePiece(tmp);
                     check = 0;
                 }
                 else
