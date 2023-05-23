@@ -12,17 +12,46 @@ gint y = -1;
 gint dest_x = -1;
 gint dest_y = -1;
 
+GtkWidget* toMove;
+GtkWidget *choose;
+
 static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *event, gpointer data)
 {
-    
-    GtkWidget* toMove;
-
     if(x == -1 && y == -1)
     {
         x = event->x;
         y = event->y;
         x = floor(x/100)*100;
         y = floor(y/100)*100;
+
+        int found = 0;
+
+        if(GTK_IS_CONTAINER(fixed))
+        {
+            GList *children = gtk_container_get_children(GTK_CONTAINER(fixed));
+            int len = g_list_length(children);
+            for(int i = 0; i < len; i++)
+            {
+                GtkWidget *widget = (GtkWidget*)g_list_nth_data(children, i);
+                int wx,wy;
+                gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
+                wx = wx-26;
+                wy = wy-60;
+                if(wx == x && wy == y && gtk_widget_get_allocated_width(widget) == 100)
+                {  
+                    found = 1;
+                    toMove = widget;
+                    gtk_fixed_put(GTK_FIXED(fixed), choose, x+10, y+10);
+                    return TRUE;
+                }
+            }
+        }
+
+        if(found == 0)
+        {
+            x = -1;
+            y = -1;
+        }
 
         return TRUE;
     }
@@ -36,82 +65,13 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
 
     if(dest_x != -1 && x!=-1 && dest_y != -1 && y!=-1)
     {
-        if(GTK_IS_CONTAINER(fixed)) {
-            GList *children = gtk_container_get_children(GTK_CONTAINER(fixed));
-            size_t found = 0;
-            for (guint i = 0; i < g_list_length(children); ++i) {
-                GtkWidget* widget = (GtkWidget*)g_list_nth_data(children, i);
-                int wx = 0;
-                int wy = 0;
-                gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
-                wx = wx-26;
-                wy = wy-60;
-                if(wx == x && wy == y)
-                {
-                    if(gtk_widget_get_allocated_width(widget) != 100 && x == 0 && y == 0)
-                    {
-                        size_t find = 0;
-                        guint j = 0;
-                        while(j < g_list_length(children) && find == 0)
-                        {
-                            GtkWidget* compare = (GtkWidget*)g_list_nth_data(children, j);
-                            gint cx, cy;
-                            gtk_widget_translate_coordinates(compare, gtk_widget_get_toplevel(compare), 0, 0, &cx, &cy);
-                            cx -= 26;
-                            cy -= 60;
-                            if(cx == x && cy == y)
-                            {
-                                if(gtk_widget_get_allocated_width(compare) == 100)
-                                {
-                                    find = 1;
-                                }
-                                
-                            }
-                            j++;
-                        }
-                        // SI il n'y a rien en case (0,0) mais qu'il a cliqué dessus
-                        if(find == 0)
-                        {
-                            x = -1;
-                            y = -1;
-                            dest_x = -1;
-                            dest_y = -1;
-                        }
-                        
-                    }
-                    else{
-                        // WIDGET qui est sélectionné est correct, la destination peut être tout type de case 
 
-                        // checker si le move est possible pour pouvoir faire la suite
-                        
-                        found = 1;
-                        toMove = widget;
-                        printf("%f\n", floor(dest_x));
-                        gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
-
-
-
-
-                        x = -1;
-                        y = -1;
-                        dest_x = -1;
-                        dest_y = -1;
-                    }
-                    
-                }
-            
-            }
-            // Si CASE VIDE
-            if(found == 0)
-            {
-                win = 1;
-                x = -1;
-                y = -1;
-                dest_x = -1;
-                dest_y = -1;
-            }
-        }
-        
+        gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
+        x = -1;
+        y = -1;
+        dest_x = -1;
+        dest_y = -1;
+        gtk_widget_destroy(choose);
     }
     
     return TRUE;
@@ -119,6 +79,13 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
 
 void set_image()
 {
+    
+    GdkPixbuf* chooseimg = gdk_pixbuf_new_from_file_at_scale ("chess/choose.png", 80, 80, TRUE, NULL);
+
+    choose = gtk_image_new();
+    gtk_image_set_from_pixbuf(GTK_IMAGE(choose), chooseimg);
+    gtk_widget_show(choose);
+
     GdkPixbuf* img = gdk_pixbuf_new_from_file_at_scale ("chess/black/pion.png", 100, 100, TRUE, NULL);
     GdkPixbuf* img2 = gdk_pixbuf_new_from_file_at_scale ("chess/white/pion.png", 100, 100, TRUE, NULL);
 

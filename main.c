@@ -3,9 +3,33 @@
 #include <math.h>
 
 GtkWidget *fixed;
+GtkWidget *menu;
 GtkWidget *fixed2;
+GtkWidget *general;
 GtkWidget* window;
 size_t win = 0;
+
+GtkWidget *bishop;
+GtkWidget *rook;
+GtkWidget *queen;
+GtkWidget *knight;
+
+GtkWidget *title;
+GtkWidget *wturn;
+
+GtkWidget *endWindow;
+
+GtkWidget *stack;
+
+GtkWidget *launchGame;
+GtkWidget *winnerLabel;
+GtkWidget *menuTitle;
+GtkWidget *welcome;
+GtkWidget *playLabel;
+GtkWidget *stop;
+GtkWidget *stopLabel;
+GtkWidget *checkLabel;
+GtkWidget *checkMateLabel;
 
 int hasmoved;
 struct piece** board;
@@ -20,11 +44,13 @@ gint y = -1;
 gint dest_x = -1;
 gint dest_y = -1;
 
+GtkWidget* toMove;
+GtkWidget *choose;
+GdkPixbuf* chooseimg;
+
 static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *event, gpointer data)
 {
     
-    GtkWidget* toMove;
-
     if(x == -1 && y == -1)
     {
         x = event->x;
@@ -32,8 +58,38 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
         x = floor(x/100)*100;
         y = floor(y/100)*100;
 
+        int found = 0;
+
+        if(GTK_IS_CONTAINER(fixed))
+        {
+            GList *children = gtk_container_get_children(GTK_CONTAINER(fixed));
+            int len = g_list_length(children);
+            for(int i = 0; i < len; i++)
+            {
+                GtkWidget *widget = (GtkWidget*)g_list_nth_data(children, i);
+                int wx,wy;
+                gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
+                wx = wx-26;
+                wy = wy-60;
+                if(wx == x && wy == y && gtk_widget_get_allocated_width(widget) == 100)
+                {  
+                    found = 1;
+                    toMove = widget;
+                    gtk_fixed_put(GTK_FIXED(fixed), choose, x, y);
+                    return TRUE;
+                }
+            }
+        }
+
+        if(found == 0)
+        {
+            x = -1;
+            y = -1;
+        }
+
         return TRUE;
     }
+
     if(x != -1 && y != -1 && dest_x == -1 && dest_y == -1)
     {
         dest_x = event->x;
@@ -44,168 +100,152 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
 
     if(dest_x != -1 && x!=-1 && dest_y != -1 && y!=-1)
     {
+        gtk_container_remove(GTK_CONTAINER(fixed), choose);
+        chooseimg = gdk_pixbuf_new_from_file_at_scale ("chess/choose.png", 100, 100, TRUE, NULL);
+        choose = gtk_image_new();
+        gtk_image_set_from_pixbuf(GTK_IMAGE(choose), chooseimg);
+        gtk_widget_show(choose);
         
-        if(GTK_IS_CONTAINER(fixed)) {
+        bx = floor(x/100);                
+        by = floor(y/100);
+        bxx = floor(dest_x/100);
+        byy = floor(dest_y/100);
 
-            GList *children = gtk_container_get_children(GTK_CONTAINER(fixed));
-            int len = g_list_length(children);
-            size_t found = 0;
-            for (guint i = 0; i < len; ++i) {
-                GtkWidget* widget = (GtkWidget*)g_list_nth_data(children, i);
-                int wx = 0;
-                int wy = 0;
-                gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
-                wx = wx-26;
-                wy = wy-60;
-                if(wx == x && wy == y)
-                {
-                    
-                    if(gtk_widget_get_allocated_width(widget) != 100 && x == 0 && y == 0)
-                    {
-                        size_t find = 0;
-                        guint j = 0;
-                        while(j < g_list_length(children) && find == 0)
-                        {
-                            GtkWidget* compare = (GtkWidget*)g_list_nth_data(children, j);
-                            gint cx, cy;
-                            gtk_widget_translate_coordinates(compare, gtk_widget_get_toplevel(compare), 0, 0, &cx, &cy);
-                            cx -= 26;
-                            cy -= 60;
-                            if(cx == x && cy == y)
-                            {
-                                if(gtk_widget_get_allocated_width(compare) == 100)
-                                {
-                                    //printf("oui");
-                                    find = 1;
-                                }
-                                
-                            }
-                            j++;
-                        }
-                        // SI il n'y a rien en case (0,0) mais qu'il a cliqué dessus
-                        if(find == 0)
-                        {
-                            x = -1;
-                            y = -1;
-                            dest_x = -1;
-                            dest_y = -1;
-                        }
-                        
-                    }
-                    else{
-                        // WIDGET qui est sélectionné est correct, la destination peut être tout type de case 
+        printf("source : x = %i, y = %i\n", bx, by);
+        printf("dest : x = %i, y = %i\n", bxx, byy);
 
-                        // checker si le move est possible pour pouvoir faire la suite
-                        
-                        bx = floor(x/100);
-                        by = floor(y/100);
-                        bxx = floor(dest_x/100);
-                        byy = floor(dest_y/100);
-
-                        printf("source : x = %i, y = %i\n", bx, by);
-                        printf("dest : x = %i, y = %i\n", bxx, byy);
-
-                        found = 1;
-                        //printf("test");
-                        if((turn%2 == 0 && board[bx + 8*by]->color == WHITE) || (turn%2 == 1 && board[bx + 8*by]->color == BLACK))
-                        {
-                            int moved = move(board,board[bx + by*8],bxx,byy);
-                            if(moved)
-                            {
-                                if(moved >= 1)
-                                {
-                                    int mx = moved % 8;
-                                    int my = moved / 8;
-                                    GList *c = gtk_container_get_children(GTK_CONTAINER(fixed));
-                                    for (guint i = 0; i < g_list_length(c); ++i) 
-                                    {
-                                        GtkWidget* widget = (GtkWidget*)g_list_nth_data(c, i);
-                                        int wx = 0;
-                                        int wy = 0;
-                                        gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
-                                        wx = wx-26;
-                                        wy = wy-60;
-                                        wx = wx / 100;
-                                        wy = wy / 100;
-                                        if(mx == wx && my == wy && gtk_widget_get_allocated_width(widget) == 100)
-                                        {
-                                            gtk_widget_destroy(widget);
-                                            break;
-                                        }
-                                    }
-                                }
-                                hasmoved = 1;
-                                toMove = widget;
-                                //printf("%f\n", floor(dest_x));
-                                gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
-                            }
-                            else if(board[bx+8*by]->role == KING && board[bxx+byy*8]->role == ROOK)
-                            {
-                                if(byy>by && canShortCastle(board,board[bx+8*by]))
-                                {
-                                    shortCastle(board,board[bx+8*by]);
-                                    toMove = widget;
-                                    //printf("%f\n", floor(dest_x));
-                                    gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
-                                    hasmoved = 1;
-                                }
-                                if(byy<by && canLongCastle(board,board[bx+8*by]))
-                                {
-                                    longCastle(board,board[bx+8*by]);
-                                    hasmoved = 1;
-                                    toMove = widget;
-                                    //printf("%f\n", floor(dest_x));
-                                    gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
-                                }
-
-                            }
-                        }
-                        if(hasmoved == 1)
-                        {
-                            turn++;
-                            hasmoved=0;
-                            if(isCheckinG(board,bxx,byy))
-                            {
-                                int temp = checkMate(board,board[bxx+byy*8]->color*-1,bxx,byy);
-                                printboard(board);
-                                if(temp)
-                                {
-                                    printf("FINIS\n");
-                                    //return board[bxx+byy*8]->color;
-                                    return TRUE;
-                                }
-                            }
-                        }    
-
-
-                        x = -1;
-                        y = -1;
-                        dest_x = -1;
-                        dest_y = -1;
-                        return TRUE;
-                    }
-                    
-                }
-            
-            }
-            // Si CASE VIDE
-            if(found == 0)
+        if((turn%2 == 0 && board[bx + 8*by]->color == WHITE) || (turn%2 == 1 && board[bx + 8*by]->color == BLACK))
+        {
+            int moved = move(board,board[bx + by*8],bxx,byy);
+            if(moved)
             {
-                win = 1;
-                x = -1;
-                y = -1;
-                dest_x = -1;
-                dest_y = -1;
+                if(moved >= 1)
+                {
+                    int mx = moved % 8;
+                    int my = moved / 8;
+                    GList *c = gtk_container_get_children(GTK_CONTAINER(fixed));
+                    for (guint i = 0; i < g_list_length(c); ++i) 
+                    {
+                        GtkWidget* widget = (GtkWidget*)g_list_nth_data(c, i);
+                        int wx = 0;
+                        int wy = 0;
+                        gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
+                        wx = wx-26;
+                        wy = wy-60;
+                        wx = wx / 100;
+                        wy = wy / 100;
+                        if(mx == wx && my == wy && gtk_widget_get_allocated_width(widget) == 100)
+                        {
+                            gtk_widget_destroy(widget);
+                            break;
+                        }
+                    }
+                }
+                hasmoved = 1;
+                //toMove = widget;
+                //printf("%f\n", floor(dest_x));
+                gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
+            }
+            else if(board[bx+8*by]->role == KING && board[bxx+byy*8]->role == ROOK)
+            {
+                if(byy>by && canShortCastle(board,board[bx+8*by]))
+                {
+                    shortCastle(board,board[bx+8*by]);
+                    //toMove = widget;
+                    //printf("%f\n", floor(dest_x));
+                    gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
+                    hasmoved = 1;
+                }
+                if(byy<by && canLongCastle(board,board[bx+8*by]))
+                {
+                    longCastle(board,board[bx+8*by]);
+                    hasmoved = 1;
+                    //toMove = widget;
+                    //printf("%f\n", floor(dest_x));
+                    gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
+                }
+
             }
         }
-        
+
+        if(hasmoved == 1)
+        {
+            turn++;
+            if(turn%2 == 1)
+            {
+                gtk_label_set_text(wturn, "Turn to BLACK");
+            }
+            else
+            {
+                gtk_label_set_text(wturn, "Turn to WHITE");
+            }
+            hasmoved=0;
+            if(isCheckinG(board,bxx,byy))
+            {
+                int temp = checkMate(board,board[bxx+byy*8]->color*-1,bxx,byy);
+                //printboard(board);
+                if(temp)
+                {
+                    gtk_widget_show(wturn);
+                    gtk_widget_show(checkMateLabel);
+                    if(board[bxx+byy*8]->color == BLACK)
+                    {
+                        gtk_label_set_text(wturn, "Black have won");
+                    }
+                    else
+                    {
+                        gtk_label_set_text(wturn, "White have won");
+                    }
+
+                    //sleep(5);
+                    //quick_message(GTK_WINDOW(window), "coucou les ptis loups");
+                    //removeWidget();
+
+                    
+                    return TRUE;
+                }
+                gtk_widget_show (checkLabel);
+            }
+            else
+            {
+                gtk_widget_hide (checkLabel);
+            }
+            if(canPromote(board[bxx+byy*8]))
+            {
+                // quel role il choisit
+
+                gtk_widget_show (bishop);
+                gtk_widget_show (queen);
+                gtk_widget_show (knight);
+                gtk_widget_show (rook);
+
+                gtk_widget_set_sensitive (GTK_WIDGET(bishop), TRUE);
+                gtk_widget_set_sensitive (GTK_WIDGET(queen), TRUE);
+                gtk_widget_set_sensitive (GTK_WIDGET(knight), TRUE);
+                gtk_widget_set_sensitive (GTK_WIDGET(rook), TRUE);
+
+            }
+        }    
+
+
+        x = -1;
+        y = -1;
+        dest_x = -1;
+        dest_y = -1;
+        return TRUE;
     }
-    
-    return TRUE;
-}
+    return TRUE;              
+}             
 
 void set_image()
 {
+
+    chooseimg = gdk_pixbuf_new_from_file_at_scale ("chess/choose.png", 100, 100, TRUE, NULL);
+
+    choose = gtk_image_new();
+    gtk_image_set_from_pixbuf(GTK_IMAGE(choose), chooseimg);
+    gtk_widget_show(choose);
+
     GdkPixbuf* img = gdk_pixbuf_new_from_file_at_scale ("chess/black/pion.png", 100, 100, TRUE, NULL);
     GdkPixbuf* img2 = gdk_pixbuf_new_from_file_at_scale ("chess/white/pion.png", 100, 100, TRUE, NULL);
 
@@ -409,41 +449,340 @@ void set_image()
 
 }
 
-int main(int argc, char *argv[] )
+void removeWidget()
 {
-	gtk_init (&argc, &argv);
+    GList *children = gtk_container_get_children(GTK_CONTAINER(fixed));
+    int len = g_list_length(children);
+    for(int i = 0; i < len; i++)
+    {
+        GtkWidget *widget = (GtkWidget*)g_list_nth_data(children, i);
+        if(gtk_widget_get_allocated_width(widget) == 100)
+            gtk_widget_destroy(widget);
+    }
+}
 
+GtkWidget* getWidget(int x, int y)
+{
+    GList *children = gtk_container_get_children(GTK_CONTAINER(fixed));
+    GtkWidget* res;
+    int len = g_list_length(children);
+    for(int i = 0; i < len; i++)
+    {
+        GtkWidget *widget = (GtkWidget*)g_list_nth_data(children, i);
+        int wx,wy;
+        gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
+        wx = wx-26;
+        wy = wy-60;
+        if(wx == x && wy == y)
+        {
+            res = widget;
+            break;
+        }
+    }
+    return res;
+}
+
+void promote_bishop()
+{
+    promotion(board[bxx+byy*8], BISHOP);
+    gtk_widget_set_sensitive (GTK_WIDGET(bishop), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(queen), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(knight), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(rook), FALSE);
+    gtk_widget_hide (bishop);
+    gtk_widget_hide (queen);
+    gtk_widget_hide (knight);
+    gtk_widget_hide (rook);
+    GtkWidget* old = getWidget(bxx*100, byy*100);
+    gtk_widget_destroy(old);
+    GdkPixbuf* fou;
+    if(board[bxx+byy*8]->color == WHITE)
+    {
+        fou = gdk_pixbuf_new_from_file_at_scale ("chess/white/fou.png", 100, 100, TRUE, NULL);
+        
+    }
+    else
+    {
+        fou = gdk_pixbuf_new_from_file_at_scale ("chess/black/fou.png", 100, 100, TRUE, NULL);
+    }
+    GtkWidget *foub = gtk_image_new();
+    gtk_image_set_from_pixbuf(GTK_IMAGE(foub), fou);
+    gtk_widget_show(foub);
+    gtk_fixed_put(GTK_FIXED(fixed), foub, bxx*100, byy*100);
+}
+
+void promote_queen()
+{
+    promotion(board[bxx+byy*8], QUEEN);
+    gtk_widget_set_sensitive (GTK_WIDGET(bishop), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(queen), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(knight), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(rook), FALSE);
+    gtk_widget_hide (bishop);
+    gtk_widget_hide (queen);
+    gtk_widget_hide (knight);
+    gtk_widget_hide (rook);
+
+    GtkWidget* old = getWidget(bxx*100, byy*100);
+    gtk_widget_destroy(old);
+    GdkPixbuf* reine;
+    if(board[bxx+byy*8]->color == WHITE)
+    {
+        reine = gdk_pixbuf_new_from_file_at_scale ("chess/white/reine.png", 100, 100, TRUE, NULL);
+        
+    }
+    else
+    {
+        reine = gdk_pixbuf_new_from_file_at_scale ("chess/black/reine.png", 100, 100, TRUE, NULL);
+    }
+    GtkWidget *reineb = gtk_image_new();
+    gtk_image_set_from_pixbuf(GTK_IMAGE(reineb), reine);
+    gtk_widget_show(reineb);
+    gtk_fixed_put(GTK_FIXED(fixed), reineb, bxx*100, byy*100);
+}
+
+void promote_knight()
+{
+    promotion(board[bxx+byy*8], KNIGHT);
+    gtk_widget_set_sensitive (GTK_WIDGET(bishop), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(queen), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(knight), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(rook), FALSE);
+    gtk_widget_hide (bishop);
+    gtk_widget_hide (queen);
+    gtk_widget_hide (knight);
+    gtk_widget_hide (rook);
+
+    GtkWidget* old = getWidget(bxx*100, byy*100);
+    gtk_widget_destroy(old);
+    GdkPixbuf* cavalier;
+    if(board[bxx+byy*8]->color == WHITE)
+    {
+        cavalier = gdk_pixbuf_new_from_file_at_scale ("chess/white/cavalier.png", 100, 100, TRUE, NULL);
+        
+    }
+    else
+    {
+        cavalier = gdk_pixbuf_new_from_file_at_scale ("chess/black/cavalier.png", 100, 100, TRUE, NULL);
+    }
+    GtkWidget *cavalierb = gtk_image_new();
+    gtk_image_set_from_pixbuf(GTK_IMAGE(cavalierb), cavalier);
+    gtk_widget_show(cavalierb);
+    gtk_fixed_put(GTK_FIXED(fixed), cavalierb, bxx*100, byy*100);
+}
+
+void promote_rook()
+{
+    promotion(board[bxx+byy*8], ROOK);
+    gtk_widget_set_sensitive (GTK_WIDGET(bishop), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(queen), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(knight), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(rook), FALSE);
+    gtk_widget_hide (bishop);
+    gtk_widget_hide (queen);
+    gtk_widget_hide (knight);
+    gtk_widget_hide (rook);
+
+    GtkWidget* old = getWidget(bxx*100, byy*100);
+    gtk_widget_destroy(old);
+    GdkPixbuf* tour;
+    if(board[bxx+byy*8]->color == WHITE)
+    {
+        tour = gdk_pixbuf_new_from_file_at_scale ("chess/white/tour.png", 100, 100, TRUE, NULL);
+        
+    }
+    else
+    {
+        tour = gdk_pixbuf_new_from_file_at_scale ("chess/black/tour.png", 100, 100, TRUE, NULL);
+    }
+    GtkWidget *tourb = gtk_image_new();
+    gtk_image_set_from_pixbuf(GTK_IMAGE(tourb), tour);
+    gtk_widget_show(tourb);
+    gtk_fixed_put(GTK_FIXED(fixed), tourb, bxx*100, byy*100);
+}
+void stopG()
+{
+    removeWidget();
+    gtk_widget_show(welcome);
+    gtk_widget_show(playLabel);
+    gtk_widget_show(launchGame);
+    gtk_widget_hide(stop);
+    gtk_widget_hide(stopLabel);
+    gtk_widget_hide(wturn);
+    gtk_widget_hide(checkMateLabel);
+    gtk_widget_hide(checkLabel);
+}
+void launch()
+{
+    set_image();
+    gtk_widget_hide(welcome);
+    gtk_widget_hide(playLabel);
+    gtk_label_set_text(wturn, "Turn to WHITE");
+    gtk_widget_hide(launchGame);
     board = malloc(64*sizeof(struct piece));
     checkMatevalue = 0;
     check = 0;
     turn = 0;
     hasmoved = 0;
     initParty(board, WHITE);
+    
+    gtk_widget_show(stop);
+    gtk_widget_show(stopLabel);
+    
+    
+}
 
+int main(int argc, char *argv[] )
+{
+	gtk_init (&argc, &argv);
+    
+    bishop = gtk_button_new();
+    queen = gtk_button_new();
+    knight = gtk_button_new();
+    rook = gtk_button_new();
+
+    launchGame = gtk_button_new();
+    gtk_button_set_label(GTK_BUTTON(launchGame), "New Game");
+    gtk_widget_set_size_request(launchGame, 200, 50);
+
+    stop = gtk_button_new();
+    gtk_button_set_label(GTK_BUTTON(stop), "Stop Game");
+    gtk_widget_set_size_request(stop, 200, 50);
     
 
+    gtk_button_set_label(GTK_BUTTON(bishop), "bishop");
+    gtk_button_set_label(GTK_BUTTON(queen), "queen");
+    gtk_button_set_label(GTK_BUTTON(knight), "knight");
+    gtk_button_set_label(GTK_BUTTON(rook), "rook");
 
+    gtk_widget_set_sensitive (GTK_WIDGET(bishop), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(queen), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(knight), FALSE);
+    gtk_widget_set_sensitive (GTK_WIDGET(rook), FALSE);
+
+    gtk_widget_set_size_request(bishop, 100, 50);
+    gtk_widget_set_size_request(queen, 100, 50);
+    gtk_widget_set_size_request(knight, 100, 50);
+    gtk_widget_set_size_request(rook, 100, 50);
 
 	// WINDOW
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	gtk_container_set_border_width (GTK_CONTAINER (window), 0);
-    gtk_window_set_default_size (GTK_WINDOW(window), 800, 800);
+    gtk_window_set_default_size (GTK_WINDOW(window), 1200, 800);
     gtk_window_set_resizable (GTK_WINDOW(window), FALSE);
     gtk_window_set_title(GTK_WINDOW(window), "StockMeat");
 	g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_widget_show (window);
+    
+    //endWindow = gtk_dialog_new();
+
+    stack = gtk_stack_new();
+    gtk_widget_show (stack);
+    gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(stack));
+
+    menu = gtk_fixed_new();
+    gtk_widget_show(menu);
+    general = gtk_fixed_new();
+    gtk_widget_show(general);
+
+    gtk_stack_add_named(GTK_STACK(stack), general, "general");
+    gtk_stack_add_named(GTK_STACK(stack), menu, "menu");
+    
+    //gtk_stack_add_named(GTK_STACK(stack), end, "end");
+
+    
+
+    GdkDisplay *display;
+    GdkScreen *screen;
+
+    display = gdk_display_get_default();
+    screen = gdk_display_get_default_screen(display);
+
+    GtkCssProvider* provider;
+    provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_path(provider, "style.css", NULL);
+    gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+    g_object_unref(provider);
+
+    menuTitle = gtk_label_new("STOCKMEAT");
+    gtk_widget_set_size_request(menuTitle, 1200, 200);
+    gtk_widget_set_name(menuTitle, "menuTitle");
+    gtk_widget_show (menuTitle);
+    gtk_widget_show (launchGame);
+    //gtk_widget_show (stop);
+    //gtk_fixed_put(GTK_FIXED(menu), menuTitle, 0, 50);
+    
+
+    title = gtk_label_new("STOCKMEAT");
+    gtk_widget_set_size_request(title, 300, 50);
+    gtk_widget_set_name(title, "h1");
+    gtk_widget_show (title);
+
+    checkLabel = gtk_label_new("CHECK");
+    gtk_widget_set_size_request(checkLabel, 400, 50);
+    gtk_widget_set_name(checkLabel, "check");
+
+    checkMateLabel = gtk_label_new("CHECKMATE");
+    gtk_widget_set_size_request(checkMateLabel, 400, 50);
+    gtk_widget_set_name(checkMateLabel, "check");
+    //gtk_widget_show (checkLabel);
+
+    welcome = gtk_label_new("welcome in");
+    gtk_widget_set_size_request(welcome, 400, 50);
+    gtk_widget_set_name(welcome, "welcome");
+    gtk_widget_show (welcome);
+
+    playLabel = gtk_label_new("do you want to play?");
+    gtk_widget_set_size_request(playLabel, 400, 50);
+    gtk_widget_set_name(playLabel, "welcome");
+    gtk_widget_show (playLabel);
+
+    stopLabel = gtk_label_new("do you want to stop?");
+    gtk_widget_set_size_request(stopLabel, 400, 50);
+    gtk_widget_set_name(stopLabel, "welcome");
+    //gtk_widget_show (stopLabel);
+    
+    winnerLabel = gtk_label_new("");
+    gtk_widget_set_size_request(winnerLabel, 300, 50);
+    gtk_widget_set_name(winnerLabel, "h1");
+    gtk_widget_show (winnerLabel);
+
+    wturn = gtk_label_new("");
+    gtk_widget_set_name(wturn, "texte");
+    gtk_widget_set_name(launchGame, "button-30");
+    gtk_widget_set_name(stop, "button-30");
+    gtk_widget_set_size_request(wturn, 400, 50);
+    
+    gtk_widget_show (wturn);
+
+    gtk_fixed_put(GTK_FIXED(general), bishop, 880, 600);
+    gtk_fixed_put(GTK_FIXED(general), queen, 1020, 600);
+    gtk_fixed_put(GTK_FIXED(general), knight, 880, 700);
+    gtk_fixed_put(GTK_FIXED(general), rook, 1020, 700);
+    
+    gtk_fixed_put(GTK_FIXED(general), title, 850, 65);
+    gtk_fixed_put(GTK_FIXED(general), welcome, 800, 10);
+    gtk_fixed_put(GTK_FIXED(general), playLabel, 800, 130);
+    gtk_fixed_put(GTK_FIXED(general), wturn, 800, 260);
+    gtk_fixed_put(GTK_FIXED(general), launchGame, 900, 195);
+    gtk_fixed_put(GTK_FIXED(general), stopLabel, 800, 130);
+    gtk_fixed_put(GTK_FIXED(general), stop, 900, 195);
+    gtk_fixed_put(GTK_FIXED(general), checkLabel, 800, 325);
+    gtk_fixed_put(GTK_FIXED(general), checkMateLabel, 800, 325);
+    //gtk_fixed_put(GTK_FIXED(end), winnerLabel, 0, 0);
 
     // EVENT BOX
     GtkWidget* eventbox = gtk_event_box_new();
     gtk_widget_set_size_request(eventbox, 800, 800);
+    gtk_fixed_put(GTK_FIXED(general), eventbox, 0, 0);
     
-    gtk_container_add(GTK_CONTAINER(window), eventbox);
+    
     gtk_widget_show(eventbox);
 
 	// FIXED
 	fixed = gtk_fixed_new();
 	gtk_widget_show (fixed);
-    gtk_container_add(GTK_CONTAINER(eventbox), GTK_WIDGET(fixed));
+    gtk_container_add(GTK_CONTAINER(eventbox), fixed);
     
     GdkPixbuf* ch = gdk_pixbuf_new_from_file_at_scale ("chess/chessplate.jpg", 800, 800, TRUE, NULL);
     GtkWidget *chess = gtk_image_new();
@@ -452,10 +791,21 @@ int main(int argc, char *argv[] )
     gtk_fixed_put(GTK_FIXED(fixed), chess, 0, 0);
 
     // MET LES IMAGES
-    set_image();
+    //set_image();
 
     g_signal_connect (G_OBJECT (eventbox), "button_press_event", G_CALLBACK (button_press_callback), NULL);
     
+    g_signal_connect(bishop, "clicked", G_CALLBACK(promote_bishop), NULL);
+    g_signal_connect(queen, "clicked", G_CALLBACK(promote_queen), NULL);
+    g_signal_connect(rook, "clicked", G_CALLBACK(promote_rook), NULL);
+    g_signal_connect(knight, "clicked", G_CALLBACK(promote_knight), NULL);
+
+    g_signal_connect(launchGame, "clicked", G_CALLBACK(launch), NULL);
+    g_signal_connect(stop, "clicked", G_CALLBACK(stopG), NULL);
+    //g_signal_connect(queen, "clicked", G_CALLBACK(promotion(board[bxx+byy*8], QUEEN)), NULL);
+    //g_signal_connect(knight, "clicked", G_CALLBACK(promotion(board[bxx+byy*8], KNIGHT)), NULL);
+    //g_signal_connect(rook, "clicked", G_CALLBACK(promotion(board[bxx+byy*8], ROOK)), NULL);
+
 	gtk_main ();
 	return 0;
 }

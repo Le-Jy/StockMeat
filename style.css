@@ -1,0 +1,57 @@
+label{
+    font-family: "Lucida Console", Monaco, monospace;
+}
+
+/* CSS */
+#button-30 {
+  background-color: #FCFCFD;
+  border-radius: 4px;
+  border-width: 0;
+  box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;
+  color: seagreen;
+  font-family: "JetBrains Mono",monospace;
+  padding-left: 16px;
+  padding-right: 16px;
+  text-decoration: none;
+  transition: box-shadow .15s,transform .15s;
+  font-size: 18px;
+}
+
+#button-30:focus {
+  box-shadow: #D6D6E7 0 0 0 1.5px inset, rgba(45, 35, 66, 0.4) 0 2px 4px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+}
+
+#button-30:hover {
+  box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, seagreen 0 -3px 0 inset;
+}
+
+#button-30:active {
+  box-shadow: seagreen 0 3px 7px inset;
+}
+
+#h1{
+    font-size: 50px;
+    color: seagreen;
+    text-shadow: 2px 2px 5px gray;
+}
+
+#texte{
+    font-size: 30px;
+    text-shadow: 2px 2px 5px gray;
+}
+
+#menuTitle{
+    font-size: 150px;
+    text-shadow: 2px 2px 5px gray;
+}
+
+#welcome{
+    font-size: 30px;
+    text-shadow: 2px 2px 5px gray;
+}
+
+#check{
+    font-size: 50px;
+    color: seagreen;
+    text-shadow: 2px 2px 5px gray;
+}
