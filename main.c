@@ -167,7 +167,8 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                             if(isCheckinG(board,bxx,byy))
                             {
                                 int temp = checkMate(board,board[bxx+byy*8]->color*-1,bxx,byy);
-                                if(checkMate(board,board[bxx+byy*8]->color*-1,bxx,byy))
+                                printboard(board);
+                                if(temp)
                                 {
                                     printf("FINIS\n");
                                     //return board[bxx+byy*8]->color;

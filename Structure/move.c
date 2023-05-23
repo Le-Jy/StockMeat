@@ -746,15 +746,18 @@ int checkMate(struct piece** board,int KingColor,int x,int y)
                 int moved = move(board,board[i],x,y);
                 if(moved)
                 {
+                    swap(board[x+y*8],board[Kingx+Kingy*8]);
                     board[i]->hasMoved = hm;
-                    move(board,board[x+y*8],Kingx,Kingy);
-                    board[x+y*8]->color = tmp->color;
-                    board[x+y*8]->hasMoved = tmp->hasMoved;
-                    board[x+y*8]->realPlayerColor = tmp->realPlayerColor;
-                    board[x+y*8]->role = tmp->role;
-                    board[x+y*8]->value = tmp->value;
-                    board[x+y*8]->x = x;
-                    board[x+y*8]->y = y;
+                    if(moved>=1)
+                    {
+                        board[x+y*8]->color = tmp->color;
+                        board[x+y*8]->hasMoved = tmp->hasMoved;
+                        board[x+y*8]->realPlayerColor = tmp->realPlayerColor;
+                        board[x+y*8]->role = tmp->role;
+                        board[x+y*8]->value = tmp->value;
+                        board[x+y*8]->x = x;
+                        board[x+y*8]->y = y;
+                    }
                     freePiece(tmp);
                     check = 0;
                 }
