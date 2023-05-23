@@ -21,7 +21,8 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
     {
         x = event->x;
         y = event->y;
-        // g_print ("first click %i,%i\n", x, y);
+        x = floor(x/100)*100;
+        y = floor(y/100)*100;
 
         return TRUE;
     }
@@ -29,7 +30,8 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
     {
         dest_x = event->x;
         dest_y = event->y;
-        // g_print ("second click %i,%i\n", dest_x, dest_y);
+        dest_x = floor(dest_x/100)*100;
+        dest_y = floor(dest_y/100)*100;
     }
 
     if(dest_x != -1 && x!=-1 && dest_y != -1 && y!=-1)
@@ -39,12 +41,14 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
             size_t found = 0;
             for (guint i = 0; i < g_list_length(children); ++i) {
                 GtkWidget* widget = (GtkWidget*)g_list_nth_data(children, i);
-                gint wx, wy;
+                int wx = 0;
+                int wy = 0;
                 gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
-                if(wx <= x && x <= wx + 100 && wy <= y && y <= wy + 100)
+                wx = wx-26;
+                wy = wy-60;
+                if(wx == x && wy == y)
                 {
-                    
-                    if(gtk_widget_get_allocated_width(widget) > 200 && x < 100 && y < 100)
+                    if(gtk_widget_get_allocated_width(widget) != 100 && x == 0 && y == 0)
                     {
                         size_t find = 0;
                         guint j = 0;
@@ -53,11 +57,12 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                             GtkWidget* compare = (GtkWidget*)g_list_nth_data(children, j);
                             gint cx, cy;
                             gtk_widget_translate_coordinates(compare, gtk_widget_get_toplevel(compare), 0, 0, &cx, &cy);
-                            if(cx <= x && x <= cx + 100 && cy <= y && y <= cy + 100)
+                            cx -= 26;
+                            cy -= 60;
+                            if(cx == x && cy == y)
                             {
-                                if(gtk_widget_get_allocated_width(compare) < 105)
+                                if(gtk_widget_get_allocated_width(compare) == 100)
                                 {
-                                    printf("oui");
                                     find = 1;
                                 }
                                 

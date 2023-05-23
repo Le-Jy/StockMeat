@@ -29,7 +29,8 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
     {
         x = event->x;
         y = event->y;
-        // g_print ("first click %i,%i\n", x, y);
+        x = floor(x/100)*100;
+        y = floor(y/100)*100;
 
         return TRUE;
     }
@@ -37,22 +38,29 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
     {
         dest_x = event->x;
         dest_y = event->y;
-        // g_print ("second click %i,%i\n", dest_x, dest_y);
+        dest_x = floor(dest_x/100)*100;
+        dest_y = floor(dest_y/100)*100;
     }
 
     if(dest_x != -1 && x!=-1 && dest_y != -1 && y!=-1)
     {
+        
         if(GTK_IS_CONTAINER(fixed)) {
+
             GList *children = gtk_container_get_children(GTK_CONTAINER(fixed));
+            int len = g_list_length(children);
             size_t found = 0;
-            for (guint i = 0; i < g_list_length(children); ++i) {
+            for (guint i = 0; i < len; ++i) {
                 GtkWidget* widget = (GtkWidget*)g_list_nth_data(children, i);
-                gint wx, wy;
+                int wx = 0;
+                int wy = 0;
                 gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
-                if(wx <= x && x <= wx + 100 && wy <= y && y <= wy + 100)
+                wx = wx-26;
+                wy = wy-60;
+                if(wx == x && wy == y)
                 {
                     
-                    if(gtk_widget_get_allocated_width(widget) > 200 && x < 100 && y < 100)
+                    if(gtk_widget_get_allocated_width(widget) != 100 && x == 0 && y == 0)
                     {
                         size_t find = 0;
                         guint j = 0;
@@ -61,9 +69,11 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                             GtkWidget* compare = (GtkWidget*)g_list_nth_data(children, j);
                             gint cx, cy;
                             gtk_widget_translate_coordinates(compare, gtk_widget_get_toplevel(compare), 0, 0, &cx, &cy);
-                            if(cx <= x && x <= cx + 100 && cy <= y && y <= cy + 100)
+                            cx -= 26;
+                            cy -= 60;
+                            if(cx == x && cy == y)
                             {
-                                if(gtk_widget_get_allocated_width(compare) < 105)
+                                if(gtk_widget_get_allocated_width(compare) == 100)
                                 {
                                     //printf("oui");
                                     find = 1;
@@ -92,14 +102,38 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                         bxx = floor(dest_x/100);
                         byy = floor(dest_y/100);
 
+                        printf("source : x = %i, y = %i\n", bx, by);
+                        printf("dest : x = %i, y = %i\n", bxx, byy);
+
                         found = 1;
                         //printf("test");
                         if((turn%2 == 0 && board[bx + 8*by]->color == WHITE) || (turn%2 == 1 && board[bx + 8*by]->color == BLACK))
                         {
-                            
-                            if(move(board,board[bx + by*8],bxx,byy))
+                            int moved = move(board,board[bx + by*8],bxx,byy);
+                            if(moved)
                             {
-                               
+                                if(moved >= 1)
+                                {
+                                    int mx = moved % 8;
+                                    int my = moved / 8;
+                                    GList *c = gtk_container_get_children(GTK_CONTAINER(fixed));
+                                    for (guint i = 0; i < g_list_length(c); ++i) 
+                                    {
+                                        GtkWidget* widget = (GtkWidget*)g_list_nth_data(c, i);
+                                        int wx = 0;
+                                        int wy = 0;
+                                        gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
+                                        wx = wx-26;
+                                        wy = wy-60;
+                                        wx = wx / 100;
+                                        wy = wy / 100;
+                                        if(mx == wx && my == wy && gtk_widget_get_allocated_width(widget) == 100)
+                                        {
+                                            gtk_widget_destroy(widget);
+                                            break;
+                                        }
+                                    }
+                                }
                                 hasmoved = 1;
                                 toMove = widget;
                                 //printf("%f\n", floor(dest_x));
@@ -137,14 +171,12 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                             hasmoved=0;
                             if(isCheckinG(board,bxx,byy))
                             {
-                                int temp = checkMate(board,board[bxx+byy*8]->color,bxx,byy);
-                                if(checkMate(board,board[bxx+byy*8]->color,bxx,byy))
+                                int temp = checkMate(board,board[bxx+byy*8]->color*-1,bxx,byy);
+                                if(checkMate(board,board[bxx+byy*8]->color*-1,bxx,byy))
                                 {
                                     printf("FINIS\n");
                                     //return board[bxx+byy*8]->color;
-                                    return TRUE;
                                 }
-                                printf("coucou : %i\n", temp);
                             }
                         }    
 
@@ -153,6 +185,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                         y = -1;
                         dest_x = -1;
                         dest_y = -1;
+                        return TRUE;
                     }
                     
                 }

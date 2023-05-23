@@ -57,7 +57,7 @@ void getPawnMoves(struct piece** board, struct piece* piece)
             newmove->next = piece->possibleMoves;
             newmove->data = piece->x+(piece->y-1)*8;
             piece->possibleMoves = newmove;
-            printf("%i\n",newmove->data);
+            //printf("%i\n",newmove->data);
 
         }
         if(h && v && board[piece->x-1+(piece->y-1)*8]->color!=piece->color && board[piece->x-1+(piece->y-1)*8]->color!=NONE)//left diag (can eat)
@@ -66,7 +66,7 @@ void getPawnMoves(struct piece** board, struct piece* piece)
             newmove->next = piece->possibleMoves;
             newmove->data = piece->x-1+(piece->y-1)*8;
             piece->possibleMoves = newmove;
-            printf("%i\n",newmove->data);
+            //printf("%i\n",newmove->data);
         }
         h = respectedRangeHorizontal(piece, 1);
         if(h && v && board[piece->x+1+(piece->y-1)*8]->color!=piece->color && board[piece->x+1+(piece->y-1)*8]->color!=NONE)//right diag (can eat)
@@ -75,7 +75,7 @@ void getPawnMoves(struct piece** board, struct piece* piece)
             newmove->next = piece->possibleMoves;
             newmove->data = piece->x+1+(piece->y-1)*8;
             piece->possibleMoves = newmove;
-            printf("%i\n",newmove->data);
+            //printf("%i\n",newmove->data);
             
             
         }
@@ -88,7 +88,7 @@ void getPawnMoves(struct piece** board, struct piece* piece)
                 newmove->next = piece->possibleMoves;
                 newmove->data = piece->x+(piece->y-2)*8;
                 piece->possibleMoves = newmove;
-                printf("%i\n",newmove->data);
+                //printf("%i\n",newmove->data);
             }
 
         }
@@ -567,10 +567,12 @@ int move(struct piece** board, struct piece* piece, int x, int y)
         board[tmpx+tmpy*8]->value = 0;
         board[tmpx+tmpy*8]->x = tmpx;
         board[tmpx+tmpy*8]->y = tmpy;
+        piece->hasMoved = 1;
+        return x+y*8;
     }
     piece->hasMoved = 1;
     
-    return 1;
+    return -1;
 }
 
 void swap(struct piece *A, struct piece *B)
