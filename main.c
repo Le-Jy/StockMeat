@@ -65,7 +65,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                             {
                                 if(gtk_widget_get_allocated_width(compare) < 105)
                                 {
-                                    printf("oui");
+                                    //printf("oui");
                                     find = 1;
                                 }
                                 
@@ -93,7 +93,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                         byy = floor(dest_y/100);
 
                         found = 1;
-                        printf("test");
+                        //printf("test");
                         if((turn%2 == 0 && board[bx + 8*by]->color == WHITE) || (turn%2 == 1 && board[bx + 8*by]->color == BLACK))
                         {
                             
@@ -102,7 +102,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                                
                                 hasmoved = 1;
                                 toMove = widget;
-                                printf("%f\n", floor(dest_x));
+                                //printf("%f\n", floor(dest_x));
                                 gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
                             }
                             else if(board[bx+8*by]->role == KING && board[bxx+byy*8]->role == ROOK)
@@ -111,7 +111,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                                 {
                                     shortCastle(board,board[bx+8*by]);
                                     toMove = widget;
-                                    printf("%f\n", floor(dest_x));
+                                    //printf("%f\n", floor(dest_x));
                                     gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
                                     hasmoved = 1;
                                 }
@@ -120,7 +120,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                                     longCastle(board,board[bx+8*by]);
                                     hasmoved = 1;
                                     toMove = widget;
-                                    printf("%f\n", floor(dest_x));
+                                    //printf("%f\n", floor(dest_x));
                                     gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
                                 }
 
@@ -137,8 +137,14 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                             hasmoved=0;
                             if(isCheckinG(board,bxx,byy))
                             {
+                                int temp = checkMate(board,board[bxx+byy*8]->color,bxx,byy);
                                 if(checkMate(board,board[bxx+byy*8]->color,bxx,byy))
-                                    return board[bxx+byy*8]->color;
+                                {
+                                    printf("FINIS\n");
+                                    //return board[bxx+byy*8]->color;
+                                    return TRUE;
+                                }
+                                printf("coucou : %i\n", temp);
                             }
                         }    
 
