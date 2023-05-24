@@ -508,6 +508,33 @@ void getKingMoves(struct piece** board, struct piece* piece)
     }
 }
 
+void sortMoves(struct piece** board, struct piece* piece)
+{
+    struct list* prev = NULL;
+    for(struct list* m = piece->possibleMoves;m!=NULL && piece->possibleMoves!=NULL;)
+    {
+        swap(board[m->data],piece);
+        int check = isCheck(board,board[m->data]->color,m->data,piece->x+piece->y*8);
+        if(check>=0)
+        {
+            printboard(board);
+            printf("%i\n",check);
+            struct list* tmp = m->next;
+            swap(board[m->data],piece);
+            if(prev == NULL)
+                piece->possibleMoves = piece->possibleMoves->next;
+            free(m);
+            m = tmp;
+        }
+        if(check==-1)
+        {
+            swap(board[m->data],piece);
+            prev = m;
+            m=m->next;
+        }
+    }
+}
+
 int isCheck(struct piece** board, int colorPlayed, int indexIgnored, int indexIgnored2)
 {
     int res = -1;
@@ -537,6 +564,8 @@ int isCheck(struct piece** board, int colorPlayed, int indexIgnored, int indexIg
 int move(struct piece** board, struct piece* piece, int x, int y)
 {
     getMoves(board,piece);
+    if(piece->role != KING)
+        sortMoves(board,piece);
     while(piece->possibleMoves)
     {
         if(piece->possibleMoves->data == x+y*8)
@@ -549,14 +578,15 @@ int move(struct piece** board, struct piece* piece, int x, int y)
     }
         
     swap(piece,board[x+y*8]);
-    
-    int isCheckIndex = isCheck(board, board[x+y*8]->color,x+y*8,piece->x+piece->y*8);
-    if(isCheckIndex>=0)
+    if(board[x+y*8]->role == KING)
     {
-        swap(piece,board[x+y*8]);
-        return 0;
+        int isCheckIndex = isCheck(board, board[x+y*8]->color,x+y*8,piece->x+piece->y*8);
+        if(isCheckIndex>=0)
+        {
+            swap(piece,board[x+y*8]);
+            return 0;
+        }
     }
-    
     if(piece->role>=1)
     {
         int tmpx = piece->x;
@@ -607,9 +637,8 @@ int canShortCastle(struct piece** board,struct piece* piece)
                 getMoves(board, p);
                 while(p->role && p->possibleMoves!=NULL && res==1)
                 {
-                    if(p->color != piece->color && ((board[p->possibleMoves->data]->y == piece->y && board[p->possibleMoves->data]->x == piece->x+1) || board[p->possibleMoves->data]->x == piece->x+2))
+                    if(p->color != piece->color && (board[p->possibleMoves->data]->y == piece->y && (board[p->possibleMoves->data]->x == piece->x+1 || board[p->possibleMoves->data]->x == piece->x+2)))
                     {
-                        
                         res = 0; 
                     }
                     p->possibleMoves = p->possibleMoves->next;
@@ -639,7 +668,7 @@ int canLongCastle(struct piece** board, struct piece* piece)
                 getMoves(board, p);
                 while(p->role !=0 && p->possibleMoves!=NULL && res==1)
                 {
-                    if(p->color != piece->color && ((board[p->possibleMoves->data]->y == piece->y && board[p->possibleMoves->data]->x == piece->x-1) || board[p->possibleMoves->data]->x == piece->x-2 || board[p->possibleMoves->data]->x == piece->x-3))
+                    if(p->color != piece->color && (board[p->possibleMoves->data]->y == piece->y && (board[p->possibleMoves->data]->x == piece->x-1 || board[p->possibleMoves->data]->x == piece->x-2 || board[p->possibleMoves->data]->x == piece->x-3)))
                     {
                         res = 0;
                     }

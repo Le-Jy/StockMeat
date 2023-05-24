@@ -148,16 +148,21 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
             }
             else if(board[bx+8*by]->role == KING && board[bxx+byy*8]->role == ROOK)
             {
-                if(byy>by && canShortCastle(board,board[bx+8*by]))
+                printf("%i %i\n",canShortCastle(board,board[bx+8*by]),canLongCastle(board,board[bx+8*by]));
+                printf("%i\n",board[bx+8*by]->hasMoved);
+                if(bxx>bx && canShortCastle(board,board[bx+8*by]))
                 {
+                    printf("testr1\n");
                     shortCastle(board,board[bx+8*by]);
+                    printf("testr1\n");
                     //toMove = widget;
                     //printf("%f\n", floor(dest_x));
                     gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
                     hasmoved = 1;
                 }
-                if(byy<by && canLongCastle(board,board[bx+8*by]))
+                if(bxx<bx && canLongCastle(board,board[bx+8*by]))
                 {
+                    printf("testr2\n");
                     longCastle(board,board[bx+8*by]);
                     hasmoved = 1;
                     //toMove = widget;

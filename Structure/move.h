@@ -19,6 +19,8 @@ void getKingMoves(struct piece** board, struct piece* piece);
 
 int move(struct piece** board, struct piece* piece, int x , int y);
 
+void sortMoves(struct piece** board, struct piece* piece);
+
 int isCheck(struct piece** board, int color, int indexIgnored, int indexIgnored2);
 
 int canShortCastle(struct piece** board,struct piece* piece);
