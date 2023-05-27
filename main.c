@@ -116,7 +116,9 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
 
         if((turn%2 == 0 && board[bx + 8*by]->color == WHITE) || (turn%2 == 1 && board[bx + 8*by]->color == BLACK))
         {
+            printf("move1");
             int moved = move(board,board[bx + by*8],bxx,byy);
+            printf("move2");
             if(moved)
             {
                 if(moved >= 1)
@@ -188,7 +190,6 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
             if(isCheckinG(board,bxx,byy))
             {
                 int temp = checkMate(board,board[bxx+byy*8]->color*-1,bxx,byy);
-                //printboard(board);
                 if(temp)
                 {
                     gtk_widget_show(wturn);

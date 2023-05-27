@@ -56,11 +56,13 @@ void newpiece (struct piece *newpiece, int x, int y,enum Color color)
 
 void freeMoves(struct piece* piece)
 {
+    struct list* tmp;
     while(piece->possibleMoves!=NULL)
     {
-        struct list* tmp = piece->possibleMoves->next;
-        free(piece->possibleMoves);
-        piece->possibleMoves = tmp; 
+        tmp = piece->possibleMoves;
+        piece->possibleMoves = piece->possibleMoves->next; 
+        free(tmp);
+        
     }
     free(piece->possibleMoves);
 }

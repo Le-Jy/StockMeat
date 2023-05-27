@@ -61,12 +61,12 @@ void main()
             printf("Please promote your pawn\n");
             printf("Bishop : 2\nKnight : 3\nRook : 4\nQueen : 5\n");
             int pr;
-            scanf("%d",&pr);
-            while(pr <2 && pr>5)
+            int err = scanf("%d",&pr);
+            while(err>1 && pr <2 && pr>5)
             {
                 printf("Please promote your pawn\n");
                 printf("Bishop : 2\nKnight : 3\nRook : 4\nQueen : 5\n");
-                scanf("%d",&pr);
+                err = scanf("%d",&pr);
             }
         }
         if(isCheckinG(board,xx,yy))
