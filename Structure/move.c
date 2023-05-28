@@ -514,12 +514,9 @@ void sortMoves(struct piece** board, struct piece* piece)
     for(struct list* m = piece->possibleMoves;m!=NULL && piece->possibleMoves!=NULL;)
     {
         swap(board[m->data],piece);
-        int check = isCheck(board,board[m->data]->color*-1,m->data,piece->x+piece->y*8);
+        int check = isCheck(board,board[m->data]->color,m->data,piece->x+piece->y*8);
         if(check>=0)
         {
-            printboard(board);
-            printf("%i\n",check);
-            printf("%i\n",board[check]->role);
             struct list* tmp = m->next;
             swap(board[m->data],piece);
             if(prev == NULL)

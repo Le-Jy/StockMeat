@@ -37,6 +37,7 @@ int checkMatevalue;
 int check;
 unsigned long turn;
 int bx,by,bxx,byy;
+int castle = 0;
 
 gint x = -1;
 gint y = -1;
@@ -183,6 +184,8 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                 if(bxx>bx && canShortCastle(board,board[bx+8*by]))
                 {
                     bxx = bxx - 1;
+                    bx = 5;
+                    castle = 1;
                     shortCastle(board,board[bx+8*by]);
                     
 
@@ -197,6 +200,8 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                 if(bxx<bx && canLongCastle(board,board[bx+8*by]))
                 {
                     bxx = bxx + 2;
+                    bx = 3;
+                    castle = 1;
                     //printf("testr2\n");
                     longCastle(board,board[bx+8*by]);
                     hasmoved = 1;
@@ -226,11 +231,39 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
             if(isCheckinG(board,bxx,byy))
             {
                 int temp = checkMate(board,board[bxx+byy*8]->color*-1,bxx,byy);
+                printf("%i\n",temp);
+                castle = 0;
                 if(temp)
                 {
                     gtk_widget_show(wturn);
                     gtk_widget_show(checkMateLabel);
                     if(board[bxx+byy*8]->color == BLACK)
+                    {
+                        gtk_label_set_text(wturn, "Black have won");
+                    }
+                    else
+                    {
+                        gtk_label_set_text(wturn, "White have won");
+                    }
+
+                    //sleep(5);
+                    //quick_message(GTK_WINDOW(window), "coucou les ptis loups");
+                    //removeWidget();
+
+                    
+                    return TRUE;
+                }
+                gtk_widget_show (checkLabel);
+            }
+            if(castle && isCheckinG(board,bx,byy))
+            {
+                castle = 0;
+                int temp = checkMate(board,board[bx+byy*8]->color*-1,bx,byy);
+                if(temp)
+                {
+                    gtk_widget_show(wturn);
+                    gtk_widget_show(checkMateLabel);
+                    if(board[bx+byy*8]->color == BLACK)
                     {
                         gtk_label_set_text(wturn, "Black have won");
                     }
