@@ -44,9 +44,34 @@ gint y = -1;
 gint dest_x = -1;
 gint dest_y = -1;
 
+GtkWidget *one;
+GtkWidget *two;
+
 GtkWidget* toMove;
 GtkWidget *choose;
 GdkPixbuf* chooseimg;
+
+GtkWidget* getWidget(int x, int y)
+{
+    GList *children = gtk_container_get_children(GTK_CONTAINER(fixed));
+    GtkWidget* res;
+    int len = g_list_length(children);
+    for(int i = 0; i < len; i++)
+    {
+        GtkWidget *widget = (GtkWidget*)g_list_nth_data(children, i);
+        int wx,wy;
+        gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
+        wx = wx-26;
+        wy = wy-60;
+        if(wx == x && wy == y && gtk_widget_get_allocated_width(widget) == 100)
+        {
+            res = widget;
+            break;
+        }
+    }
+    return res;
+}
+
 
 static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *event, gpointer data)
 {
@@ -111,14 +136,14 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
         bxx = floor(dest_x/100);
         byy = floor(dest_y/100);
 
-        printf("source : x = %i, y = %i\n", bx, by);
-        printf("dest : x = %i, y = %i\n", bxx, byy);
+        //printf("source : x = %i, y = %i\n", bx, by);
+        //printf("dest : x = %i, y = %i\n", bxx, byy);
 
         if((turn%2 == 0 && board[bx + 8*by]->color == WHITE) || (turn%2 == 1 && board[bx + 8*by]->color == BLACK))
         {
-            printf("move1");
+            //printf("move1");
             int moved = move(board,board[bx + by*8],bxx,byy);
-            printf("move2");
+            //printf("move2");
             if(moved)
             {
                 if(moved >= 1)
@@ -146,30 +171,40 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                 hasmoved = 1;
                 //toMove = widget;
                 //printf("%f\n", floor(dest_x));
+                
                 gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
             }
             else if(board[bx+8*by]->role == KING && board[bxx+byy*8]->role == ROOK)
             {
                 printf("%i %i\n",canShortCastle(board,board[bx+8*by]),canLongCastle(board,board[bx+8*by]));
                 printf("%i\n",board[bx+8*by]->hasMoved);
+                GtkWidget* first = getWidget(bx*100, by*100);
+                GtkWidget* second = getWidget(bxx*100, byy*100);
                 if(bxx>bx && canShortCastle(board,board[bx+8*by]))
                 {
-                    printf("testr1\n");
+                    bxx = bxx - 1;
                     shortCastle(board,board[bx+8*by]);
-                    printf("testr1\n");
+                    
+
+                    
                     //toMove = widget;
                     //printf("%f\n", floor(dest_x));
-                    gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
+                    
+                    gtk_fixed_move(GTK_FIXED(fixed), first, 600, by*100);
+                    gtk_fixed_move(GTK_FIXED(fixed), second, 500, by*100);
                     hasmoved = 1;
                 }
                 if(bxx<bx && canLongCastle(board,board[bx+8*by]))
                 {
-                    printf("testr2\n");
+                    bxx = bxx + 2;
+                    //printf("testr2\n");
                     longCastle(board,board[bx+8*by]);
                     hasmoved = 1;
                     //toMove = widget;
                     //printf("%f\n", floor(dest_x));
-                    gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
+                    
+                    gtk_fixed_move(GTK_FIXED(fixed), first, 2*100, by*100);
+                    gtk_fixed_move(GTK_FIXED(fixed), second, 3*100, by*100);
                 }
 
             }
@@ -187,6 +222,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                 gtk_label_set_text(wturn, "Turn to WHITE");
             }
             hasmoved=0;
+
             if(isCheckinG(board,bxx,byy))
             {
                 int temp = checkMate(board,board[bxx+byy*8]->color*-1,bxx,byy);
@@ -467,26 +503,6 @@ void removeWidget()
     }
 }
 
-GtkWidget* getWidget(int x, int y)
-{
-    GList *children = gtk_container_get_children(GTK_CONTAINER(fixed));
-    GtkWidget* res;
-    int len = g_list_length(children);
-    for(int i = 0; i < len; i++)
-    {
-        GtkWidget *widget = (GtkWidget*)g_list_nth_data(children, i);
-        int wx,wy;
-        gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
-        wx = wx-26;
-        wy = wy-60;
-        if(wx == x && wy == y)
-        {
-            res = widget;
-            break;
-        }
-    }
-    return res;
-}
 
 void promote_bishop()
 {
@@ -623,7 +639,7 @@ void launch()
     set_image();
     gtk_widget_hide(welcome);
     gtk_widget_hide(playLabel);
-    gtk_label_set_text(wturn, "Turn to WHITE");
+    //gtk_label_set_text(wturn, "Turn to WHITE");
     gtk_widget_hide(launchGame);
     board = malloc(64*sizeof(struct piece));
     checkMatevalue = 0;
