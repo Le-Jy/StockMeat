@@ -32,7 +32,6 @@ void shortCastle(struct piece** board, struct piece* piece);
 void longCastle(struct piece** board, struct piece* piece);
 
 void promotion(struct piece* piece, int role);
-
 int canPromote(struct piece* piece);
 
 void swap(struct piece *A, struct piece *B);
