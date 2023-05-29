@@ -71,7 +71,6 @@ int isCheckinG(struct piece** board, int x, int y)
 {
     getMoves(board,board[x+y*8]);
     sortMoves(board,board[x+y*8]);
-
     while(board[x+y*8]->possibleMoves != NULL)
     {
         if(board[board[x+y*8]->possibleMoves->data]->role == KING && board[board[x+y*8]->possibleMoves->data]->color != board[x+y*8]->color)
@@ -80,6 +79,7 @@ int isCheckinG(struct piece** board, int x, int y)
         }
         board[x+y*8]->possibleMoves = board[x+y*8]->possibleMoves->next;
     }
+   
 
     return 0;
 }

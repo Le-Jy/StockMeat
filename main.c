@@ -142,56 +142,20 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
 
         if((turn%2 == 0 && board[bx + 8*by]->color == WHITE) || (turn%2 == 1 && board[bx + 8*by]->color == BLACK))
         {
-            //printf("move1");
-            int moved = move(board,board[bx + by*8],bxx,byy);
-            //printf("move2");
-            if(moved)
+            printf("Start\n");
+            if(board[bx+8*by]->role == KING && board[bxx+byy*8]->role == ROOK)
             {
-                if(moved >= 1)
-                {
-                    int mx = moved % 8;
-                    int my = moved / 8;
-                    GList *c = gtk_container_get_children(GTK_CONTAINER(fixed));
-                    for (guint i = 0; i < g_list_length(c); ++i) 
-                    {
-                        GtkWidget* widget = (GtkWidget*)g_list_nth_data(c, i);
-                        int wx = 0;
-                        int wy = 0;
-                        gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
-                        wx = wx-26;
-                        wy = wy-60;
-                        wx = wx / 100;
-                        wy = wy / 100;
-                        if(mx == wx && my == wy && gtk_widget_get_allocated_width(widget) == 100)
-                        {
-                            gtk_widget_destroy(widget);
-                            break;
-                        }
-                    }
-                }
-                hasmoved = 1;
-                //toMove = widget;
-                //printf("%f\n", floor(dest_x));
-                
-                gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
-            }
-            else if(board[bx+8*by]->role == KING && board[bxx+byy*8]->role == ROOK)
-            {
-                printf("%i %i\n",canShortCastle(board,board[bx+8*by]),canLongCastle(board,board[bx+8*by]));
-                printf("%i\n",board[bx+8*by]->hasMoved);
+                printf("Try castle\n");
                 GtkWidget* first = getWidget(bx*100, by*100);
                 GtkWidget* second = getWidget(bxx*100, byy*100);
                 if(bxx>bx && canShortCastle(board,board[bx+8*by]))
                 {
+                    printf("Try short castle\n");
                     bxx = bxx - 1;
                     bx = 5;
                     castle = 1;
                     shortCastle(board,board[bx+8*by]);
-                    
-
-                    
-                    //toMove = widget;
-                    //printf("%f\n", floor(dest_x));
+                    printf("Did short castle\n");
                     
                     gtk_fixed_move(GTK_FIXED(fixed), first, 600, by*100);
                     gtk_fixed_move(GTK_FIXED(fixed), second, 500, by*100);
@@ -199,6 +163,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                 }
                 if(bxx<bx && canLongCastle(board,board[bx+8*by]))
                 {
+                    printf("Try long castle\n");
                     bxx = bxx + 2;
                     bx = 3;
                     castle = 1;
@@ -207,31 +172,77 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                     hasmoved = 1;
                     //toMove = widget;
                     //printf("%f\n", floor(dest_x));
+                    printf("Did long castle\n");
                     
                     gtk_fixed_move(GTK_FIXED(fixed), first, 2*100, by*100);
                     gtk_fixed_move(GTK_FIXED(fixed), second, 3*100, by*100);
                 }
-
             }
+            else
+            {
+                printf("Try to move\n");
+                int moved = move(board,board[bx + by*8],bxx,byy);
+                if(moved)
+                {
+                    printf("Did move %i\n",board[bxx+byy*8]->role);
+                    if(moved >= 1)
+                    {
+                        int mx = moved % 8;
+                        int my = moved / 8;
+                        GList *c = gtk_container_get_children(GTK_CONTAINER(fixed));
+                        for (guint i = 0; i < g_list_length(c); ++i) 
+                        {
+                            GtkWidget* widget = (GtkWidget*)g_list_nth_data(c, i);
+                            int wx = 0;
+                            int wy = 0;
+                            gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
+                            wx = wx-26;
+                            wy = wy-60;
+                            wx = wx / 100;
+                            wy = wy / 100;
+                            if(mx == wx && my == wy && gtk_widget_get_allocated_width(widget) == 100)
+                            {
+                                gtk_widget_destroy(widget);
+                                break;
+                            }
+                        }
+                    }
+                    hasmoved = 1;
+                    //toMove = widget;
+                    //printf("%f\n", floor(dest_x));
+                    
+                    gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
+                }
+            }
+            
         }
 
         if(hasmoved == 1)
         {
-            turn++;
-            if(turn%2 == 1)
-            {
-                gtk_label_set_text(wturn, "Turn to BLACK");
-            }
-            else
-            {
-                gtk_label_set_text(wturn, "Turn to WHITE");
-            }
+            
             hasmoved=0;
+            if(canPromote(board[bxx+byy*8]))
+            {
+                // quel role il choisit
 
+                gtk_widget_show (bishop);
+                gtk_widget_show (queen);
+                gtk_widget_show (knight);
+                gtk_widget_show (rook);
+
+                gtk_widget_set_sensitive (GTK_WIDGET(bishop), TRUE);
+                gtk_widget_set_sensitive (GTK_WIDGET(queen), TRUE);
+                gtk_widget_set_sensitive (GTK_WIDGET(knight), TRUE);
+                gtk_widget_set_sensitive (GTK_WIDGET(rook), TRUE);
+                printf("role promoted : %i\n",board[bxx+byy*8]->role);
+
+            }
+            printf("Try to check\n");
             if(isCheckinG(board,bxx,byy))
             {
+                printf("Try to checkmate\n");
                 int temp = checkMate(board,board[bxx+byy*8]->color*-1,bxx,byy);
-                printf("%i\n",temp);
+                printf("Checkmate : %i\n",temp);
                 castle = 0;
                 if(temp)
                 {
@@ -254,11 +265,15 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                     return TRUE;
                 }
                 gtk_widget_show (checkLabel);
+                printf("check\n");
             }
+            printf("no check\n");
             if(castle && isCheckinG(board,bx,byy))
             {
+                printf("Try checkmate castle\n");
                 castle = 0;
                 int temp = checkMate(board,board[bx+byy*8]->color*-1,bx,byy);
+                printf("Checkmate castle : %i\n",temp);
                 if(temp)
                 {
                     gtk_widget_show(wturn);
@@ -285,21 +300,16 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
             {
                 gtk_widget_hide (checkLabel);
             }
-            if(canPromote(board[bxx+byy*8]))
+            turn++;
+            if(turn%2 == 1)
             {
-                // quel role il choisit
-
-                gtk_widget_show (bishop);
-                gtk_widget_show (queen);
-                gtk_widget_show (knight);
-                gtk_widget_show (rook);
-
-                gtk_widget_set_sensitive (GTK_WIDGET(bishop), TRUE);
-                gtk_widget_set_sensitive (GTK_WIDGET(queen), TRUE);
-                gtk_widget_set_sensitive (GTK_WIDGET(knight), TRUE);
-                gtk_widget_set_sensitive (GTK_WIDGET(rook), TRUE);
-
+                gtk_label_set_text(wturn, "Turn to BLACK");
             }
+            else
+            {
+                gtk_label_set_text(wturn, "Turn to WHITE");
+            }
+            printf("End\n");            
         }    
 
 
@@ -705,10 +715,10 @@ int main(int argc, char *argv[] )
     gtk_widget_set_size_request(stop, 200, 50);
     
 
-    gtk_button_set_label(GTK_BUTTON(bishop), "bishop");
-    gtk_button_set_label(GTK_BUTTON(queen), "queen");
-    gtk_button_set_label(GTK_BUTTON(knight), "knight");
-    gtk_button_set_label(GTK_BUTTON(rook), "rook");
+    gtk_button_set_label(GTK_BUTTON(bishop), "Bishop");
+    gtk_button_set_label(GTK_BUTTON(queen), "Queen");
+    gtk_button_set_label(GTK_BUTTON(knight), "Knight");
+    gtk_button_set_label(GTK_BUTTON(rook), "Rook");
 
     gtk_widget_set_sensitive (GTK_WIDGET(bishop), FALSE);
     gtk_widget_set_sensitive (GTK_WIDGET(queen), FALSE);
@@ -782,12 +792,12 @@ int main(int argc, char *argv[] )
     gtk_widget_set_name(checkMateLabel, "check");
     //gtk_widget_show (checkLabel);
 
-    welcome = gtk_label_new("welcome in");
+    welcome = gtk_label_new("Welcome in");
     gtk_widget_set_size_request(welcome, 400, 50);
     gtk_widget_set_name(welcome, "welcome");
     gtk_widget_show (welcome);
 
-    playLabel = gtk_label_new("do you want to play?");
+    playLabel = gtk_label_new("Do you want to play?");
     gtk_widget_set_size_request(playLabel, 400, 50);
     gtk_widget_set_name(playLabel, "welcome");
     gtk_widget_show (playLabel);

@@ -33,12 +33,12 @@ void main()
                 hasmoved = 1;
             else if(board[x+8*y]->role == KING && board[xx+yy*8]->role == ROOK)
             {
-                if(yy>y && canShortCastle(board,board[x+8*y]))
+                if(xx>x && canShortCastle(board,board[x+8*y]))
                 {
                     shortCastle(board,board[x+8*y]);
                     hasmoved = 1;
                 }
-                if(yy<y && canLongCastle(board,board[x+8*y]))
+                if(xx<x && canLongCastle(board,board[x+8*y]))
                 {
                     longCastle(board,board[x+8*y]);
                     hasmoved = 1;

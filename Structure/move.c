@@ -511,12 +511,14 @@ void getKingMoves(struct piece** board, struct piece* piece)
 void sortMoves(struct piece** board, struct piece* piece)
 {
     struct list* prev = NULL;
+    struct list* sortedmoves = NULL;
     for(struct list* m = piece->possibleMoves;m!=NULL && piece->possibleMoves!=NULL;)
     {
         swap(board[m->data],piece);
         int check = isCheck(board,board[m->data]->color,m->data,piece->x+piece->y*8);
         if(check>=0)
         {
+            
             struct list* tmp = m->next;
             swap(board[m->data],piece);
             if(prev == NULL)
@@ -526,11 +528,16 @@ void sortMoves(struct piece** board, struct piece* piece)
         }
         if(check==-1)
         {
+            struct list* newmove = malloc(sizeof(struct piece));
             swap(board[m->data],piece);
+            newmove->next = sortedmoves;
+            newmove->data = m->data;
+            sortedmoves = newmove;
             prev = m;
             m=m->next;
         }
     }
+    piece->possibleMoves = sortedmoves;
 }
 
 int isCheck(struct piece** board, int colorPlayed, int indexIgnored, int indexIgnored2)
@@ -757,34 +764,35 @@ int checkMate(struct piece** board,int KingColor,int x,int y)
             int cpt = 0;
             while(board[i]->possibleMoves != NULL && check == 1)
             {
-                int x = (board[i]->possibleMoves->data)%8;
-                int y = (board[i]->possibleMoves->data-x)/8;
+                int px = (board[i]->possibleMoves->data)%8;
+                int py = (board[i]->possibleMoves->data-px)/8;
                 struct piece* tmp = malloc(sizeof(struct piece));
-                tmp->color = board[x+y*8]->color;
-                tmp->hasMoved = board[x+y*8]->hasMoved;
-                tmp->realPlayerColor = board[x+y*8]->realPlayerColor;
-                tmp->role = board[x+y*8]->role;
-                tmp->value = board[x+y*8]->value;
-                tmp->x = x;
-                tmp->y = y;
+                tmp->color = board[px+py*8]->color;
+                tmp->hasMoved = board[px+py*8]->hasMoved;
+                tmp->realPlayerColor = board[px+py*8]->realPlayerColor;
+                tmp->role = board[px+py*8]->role;
+                tmp->value = board[px+py*8]->value;
+                tmp->x = px;
+                tmp->y = py;
                 tmp->possibleMoves = NULL;
                 int hm = 0;
                 if(board[i]->hasMoved)
                     hm = 1;
-                int moved = move(board,board[i],x,y);
+                int moved = move(board,board[i],px,py);
+                printf("moved : %i\n",moved);
                 if(moved)
                 {
-                    swap(board[x+y*8],board[Kingx+Kingy*8]);
+                    swap(board[px+py*8],board[Kingx+Kingy*8]);
                     board[i]->hasMoved = hm;
                     if(moved>=1)
                     {
-                        board[x+y*8]->color = tmp->color;
-                        board[x+y*8]->hasMoved = tmp->hasMoved;
-                        board[x+y*8]->realPlayerColor = tmp->realPlayerColor;
-                        board[x+y*8]->role = tmp->role;
-                        board[x+y*8]->value = tmp->value;
-                        board[x+y*8]->x = x;
-                        board[x+y*8]->y = y;
+                        board[px+py*8]->color = tmp->color;
+                        board[px+py*8]->hasMoved = tmp->hasMoved;
+                        board[px+py*8]->realPlayerColor = tmp->realPlayerColor;
+                        board[px+py*8]->role = tmp->role;
+                        board[px+py*8]->value = tmp->value;
+                        board[px+py*8]->x = px;
+                        board[px+py*8]->y = py;
                     }
                     freePiece(tmp);
                     check = 0;
@@ -794,18 +802,18 @@ int checkMate(struct piece** board,int KingColor,int x,int y)
                     dangerousmoves[cpt] = board[i]->possibleMoves->data;
                     board[i]->possibleMoves = board[i]->possibleMoves->next;
                     cpt+=1;
+                    freePiece(tmp);
                 }
-                
             }
-            if(check)
-                return cannotProtectKing(board,dangerousmoves,KingColor,cpt,x,y);
+            if(check && board[x+y*8]->role!=KNIGHT)
+                return cannotProtectKing(board,dangerousmoves,KingColor,cpt,x,y,i);
         }
        
     }
     return check;
 }
 
-int cannotProtectKing(struct piece** board,int dangerousmoves[8], int KingColor, int cpt, int x, int y)
+int cannotProtectKing(struct piece** board,int dangerousmoves[8], int KingColor, int cpt, int x, int y,int Kindex)
 {
     for(int i = 0;i<63;i++)
     {
@@ -813,11 +821,25 @@ int cannotProtectKing(struct piece** board,int dangerousmoves[8], int KingColor,
         {
             struct piece* p = board[i];
             getMoves(board,p);
+            sortMoves(board,p);
+            int add;
+            if(x-y == board[Kindex]->x)
+            {
+                add = 9;
+            }
+            else if(x == board[Kindex]->x)
+            {
+                add = 8;
+            }
+            else
+            {
+                add = 7;
+            }
             while(p->possibleMoves != NULL)
             {
                 for(int j = 0; j<cpt; j++)
                 {
-                    for(int k = 0; dangerousmoves[j]+k<=x+y*8;k+=8)
+                    for(int k = 0; dangerousmoves[j]+k<=x+y*8;k+=add)
                     {
                         if(p->possibleMoves->data == dangerousmoves[j]+k)
                         {
@@ -832,7 +854,9 @@ int cannotProtectKing(struct piece** board,int dangerousmoves[8], int KingColor,
     for(int i=0;i<cpt;i++)
     {
         if(dangerousmoves[i]!=-1)
+        {
             return 1;
+        }
     }
     return 0;
 }
