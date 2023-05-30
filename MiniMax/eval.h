@@ -1,5 +1,5 @@
 #pragma once
-#include "../Strcture/board.h"
+#include "../Structure/board.h"
 
 float whitePawnEval(int x, int y);
 

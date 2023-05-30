@@ -1,7 +1,9 @@
 #include "fen.h"
+#include <string.h>
+#include "../Structure/board.h"
 
-char* getFEN(struct piece** board, enum ColorPlayer){
-    char FEN="";
+char* getFEN(struct piece** board, int colorPlayer){
+    char* FEN=malloc(256*sizeof(char));
     int blank=0;
     int pieceHere=0;
     int castleRes1;
@@ -10,7 +12,7 @@ char* getFEN(struct piece** board, enum ColorPlayer){
     int castleRes4;
     for (size_t i=0;i<8;i++){
         if (i>0){
-            strcat(FEN,'/');
+            strcat(FEN,"/");
         }
         for (size_t j=0;j<8;j++){
             piecehere=0;
@@ -23,52 +25,52 @@ char* getFEN(struct piece** board, enum ColorPlayer){
                     }
                     if (elm->role==PAWN){
                         if (elm->color==BLACK){
-                            strcat(FEN,'p');
+                            strcat(FEN,"p");
                         }
                         else{
-                            strcat(FEN,'P');
+                            strcat(FEN,"P");
                         }
                     }
                     if (elm->role==KNIGHT){
                         if (elm->color==BLACK){
-                            strcat(FEN,'n');
+                            strcat(FEN,"n");
                         }
                         else{
-                            strcat(FEN,'N');
+                            strcat(FEN,"N");
                         }
                     }
                     if (elm->role==BISHOP){
                         if (elm->color==BLACK){
-                            strcat(FEN,'b');
+                            strcat(FEN,"b");
                         }
                         else{
-                            strcat(FEN,'B');
+                            strcat(FEN,"B");
                         }
                     }
                     if (elm->role==ROOK){
                         if (elm->color==BLACK){
-                            strcat(FEN,'r');
+                            strcat(FEN,"r");
                         }
                         else{
-                            strcat(FEN,'R');
+                            strcat(FEN,"R");
                         }
                     }
                     if (elm->role==QUEEN){
                         if (elm->color==BLACK){
-                            strcat(FEN,'q');
+                            strcat(FEN,"q");
                         }
                         else{
-                            strcat(FEN,'Q');
+                            strcat(FEN,"Q");
                         }
                     }
                     if (elm->role==KING){
                         if (elm->color==BLACK){
-                            strcat(FEN,'k');
+                            strcat(FEN,"k");
                             castleRes3=canShortCastle((struct piece** board,struct piece* elm));
                             castleRes4=canLongCastle((struct piece** board,struct piece* elm));
                         }
                         else{
-                            strcat(FEN,'K');
+                            strcat(FEN,"K");
                             castleRes1=canShortCastle((struct piece** board,struct piece* elm));
                             castleRes2=canLongCastle((struct piece** board,struct piece* elm));
                         }
@@ -80,40 +82,40 @@ char* getFEN(struct piece** board, enum ColorPlayer){
             }
         }
     }
-    FEN.append(' ');
-    if (ColorPlayer==WHITE){
-        strcat(FEN,'w');
+    strcat(FEN," ");
+    if (colorPlayer==-1){
+        strcat(FEN,"w");
     }
     else{
-        strcat(FEN,'b');
+        strcat(FEN,"b");
     }
-    strcat(FEN,' ');
+    strcat(FEN," ");
     check=1;
     if (castleRes1==1){
-        strcat(FEN,'K');
+        strcat(FEN,"K");
         check=0;
     }
     if (castleRes2==1){
-        strcat(FEN,'Q');
+        strcat(FEN,"Q");
         check=0;
     }
     if (castleRes3==1){
-        strcat(FEN,'k');
+        strcat(FEN,"k");
         check=0;
     }
     if (castleRes4==1){
-        strcat(FEN,'q');
+        strcat(FEN,"q");
         check=0;
     }
     if (check==1){
-        strcat(FEN,'-');
+        strcat(FEN,"-");
     }
-    strcat(FEN,' ');
-    strcat(FEN,'-');
-    strcat(FEN,' ');
-    strcat(FEN,'0');
-    strcat(FEN,' ');
-    strcat(FEN,'1');
+    strcat(FEN," ");
+    strcat(FEN,"-");
+    strcat(FEN," ");
+    strcat(FEN,"0");
+    strcat(FEN," ");
+    strcat(FEN,"1");
     return FEN;
 }
 
