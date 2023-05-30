@@ -2,35 +2,41 @@
 
 
 
-int playMove(struct piece** board, enum Color ColorPlayer, int turn){
+float* playMove(struct piece** board, enum Color ColorPlayer, int turn){
     char FEN=(getFEN(board, ColorPlayer));
     int res=0;
     int res2=0;
     int res3=0;
     int val=0;
     int color=0;
+    float* list;
     if (ColorPlayer==WHITE){
         color=1;
     }
     if (turn<5){
-        res,res2,res3=database(FEN);
-        if (res!=NULL){
-            return res, res2, res3;
+        list=database(FEN);
+        if (list[1]!=NULL){
+            return list;
         }
         else{
-            val, res, res2, res3 = miniMax(board, 3, -infinity, +infinity, color);
+            list = miniMax(board, 3, -1000, 1000, color);
         }
     }
     else{
-        val, res, res2, res3 = miniMax(board, 3, -infinity, +infinity, color);
+        list = miniMax(board, 3, -1000, 1000, color);
     }
-    return res, res2, res3;
+    return list;
 }
 
 
-int miniMax(struct piece** board, int depth, float pruninga, float pruningb, int whiteturn){
+float* miniMax(struct piece** board, int depth, float pruninga, float pruningb, int whiteturn){
+    float* list=malloc(4*sizeof(float));
     if (depth==0){
-        return getEval(board, whiteturn);
+        list[0]=getEval(board, whiteturn);
+        list[1]=NULL;
+        list[2]=NULL;
+        list[3]=NULL;
+        return list;
     }
     struct piece*** listOfBoards = malloc(64*sizeof(struct piece));
     int datalist[300];
@@ -39,9 +45,10 @@ int miniMax(struct piece** board, int depth, float pruninga, float pruningb, int
     int destcoord=0;
     int startcoordx=0;
     int startcoordy=0;
-    
+    float* list2=malloc(4*sizeof(float));
+
     if (whiteturn){
-        int maxEval=-infinity;
+        int maxEval=-1000;
         for (int i=0;i<64;i++){
             if (board[i]->role!=0){
                 getMoves(board,board[i]);
@@ -73,23 +80,27 @@ int miniMax(struct piece** board, int depth, float pruninga, float pruningb, int
         }
         for (int k=0;k<cpt;k++){
             position=listOfBoards[k];
-            eval, destcoord, startcoordx, startcoordy=minimax(position,depth-1, pruninga, pruningb, 0);
-            if (eval>maxEval){
-                maxEval=eval;
+            list2=minimax(position,depth-1, pruninga, pruningb, 0);
+            if (list2[0]>maxEval){
+                maxEval=list2[0];
                 destcoord=datalist[k];
                 startcoordx=datalistb[k];
                 startcoordy=datalistb[k+1];
             }
-            maxEval=max(maxEval,eval);
-            pruninga=max(pruninga,eval);
+            maxEval=max(maxEval,list2[0]);
+            pruninga=max(pruninga,list2[0]);
             if (pruningb<=pruninga){
                 break;
             }
         }
-        return maxEval, destcoord, startcoordx, startcoordy;
+        list[0]=maxEval;
+        list[1]=destcoord;
+        list[2]=startcoordx;
+        list[3]=startcoordy;
+        return list;
     }
     else{
-        int minEval=+infinity;
+        int minEval=1000;
         for (int i=0;i<64;i++){
             if (board[i]->role!=0){
                 getMoves(board,board[i]);
@@ -121,9 +132,9 @@ int miniMax(struct piece** board, int depth, float pruninga, float pruningb, int
         }
         for (int k=0;k<cpt;k++){
             position=listOfBoards[k];
-            eval, destcoord, startcoordx, startcoordy=minimax(position,depth-1,pruninga, pruningb, 1);
-            if (eval<minEval){
-                maxEval=eval;
+            list2=minimax(position,depth-1,pruninga, pruningb, 1);
+            if (list2[0]<minEval){
+                maxEval=list2[0];
                 destcoord=datalist[k];
                 startcoordx=datalistb[k];
                 startcoordy=datalistb[k+1];
@@ -134,6 +145,10 @@ int miniMax(struct piece** board, int depth, float pruninga, float pruningb, int
                 break;
             }
         }
-        return minEval, destcoord, startcoordx, startcoordy;
+        list[0]=minEval;
+        list[1]=destcoord;
+        list[2]=startcoordx;
+        list[3]=startcoordy;
+        return list;
     }
 }

@@ -5,4 +5,4 @@
 
 char getFEN(struct piece** board, enum ColorPlayer);
 
-int database(char FEN);
+float* database(char FEN);
