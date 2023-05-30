@@ -29,6 +29,10 @@ label{
   box-shadow: seagreen 0 3px 7px inset;
 }
 
+#box{
+    text-shadow: 2px 2px 5px gray;
+}
+
 #h1{
     font-size: 50px;
     color: seagreen;

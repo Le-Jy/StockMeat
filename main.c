@@ -3,7 +3,7 @@
 #include <math.h>
 
 GtkWidget *fixed;
-GtkWidget *menu;
+
 GtkWidget *fixed2;
 GtkWidget *general;
 GtkWidget* window;
@@ -23,7 +23,7 @@ GtkWidget *stack;
 
 GtkWidget *launchGame;
 GtkWidget *winnerLabel;
-GtkWidget *menuTitle;
+
 GtkWidget *welcome;
 GtkWidget *playLabel;
 GtkWidget *stop;
@@ -55,15 +55,15 @@ GdkPixbuf* chooseimg;
 GtkWidget* getWidget(int x, int y)
 {
     GList *children = gtk_container_get_children(GTK_CONTAINER(fixed));
-    GtkWidget* res;
+    GtkWidget* res = NULL;
     int len = g_list_length(children);
     for(int i = 0; i < len; i++)
     {
         GtkWidget *widget = (GtkWidget*)g_list_nth_data(children, i);
         int wx,wy;
         gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
-        wx = wx-26;
-        wy = wy-60;
+        wx = wx-76;
+        wy = wy-110;
         if(wx == x && wy == y && gtk_widget_get_allocated_width(widget) == 100)
         {
             res = widget;
@@ -73,10 +73,9 @@ GtkWidget* getWidget(int x, int y)
     return res;
 }
 
-
-static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *event, gpointer data)
+static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *event)
 {
-    
+    gtk_widget_set_name(event_box, "box");
     if(x == -1 && y == -1)
     {
         x = event->x;
@@ -85,26 +84,12 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
         y = floor(y/100)*100;
 
         int found = 0;
-
-        if(GTK_IS_CONTAINER(fixed))
+        
+        toMove = getWidget(x, y);
+        if(toMove != NULL)
         {
-            GList *children = gtk_container_get_children(GTK_CONTAINER(fixed));
-            int len = g_list_length(children);
-            for(int i = 0; i < len; i++)
-            {
-                GtkWidget *widget = (GtkWidget*)g_list_nth_data(children, i);
-                int wx,wy;
-                gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
-                wx = wx-26;
-                wy = wy-60;
-                if(wx == x && wy == y && gtk_widget_get_allocated_width(widget) == 100)
-                {  
-                    found = 1;
-                    toMove = widget;
-                    gtk_fixed_put(GTK_FIXED(fixed), choose, x, y);
-                    return TRUE;
-                }
-            }
+            found = 1;
+            gtk_fixed_put(GTK_FIXED(fixed), choose, x, y);
         }
 
         if(found == 0)
@@ -136,9 +121,6 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
         by = floor(y/100);
         bxx = floor(dest_x/100);
         byy = floor(dest_y/100);
-
-        //printf("source : x = %i, y = %i\n", bx, by);
-        //printf("dest : x = %i, y = %i\n", bxx, byy);
 
         if((turn%2 == 0 && board[bx + 8*by]->color == WHITE) || (turn%2 == 1 && board[bx + 8*by]->color == BLACK))
         {
@@ -197,8 +179,8 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                             int wx = 0;
                             int wy = 0;
                             gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &wx, &wy);
-                            wx = wx-26;
-                            wy = wy-60;
+                            wx = wx-76;
+                            wy = wy-110;
                             wx = wx / 100;
                             wy = wy / 100;
                             if(mx == wx && my == wy && gtk_widget_get_allocated_width(widget) == 100)
@@ -251,25 +233,18 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                     gtk_widget_show(checkMateLabel);
                     if(board[bxx+byy*8]->color == BLACK)
                     {
-                        gtk_label_set_text(wturn, "Black have won");
+                        gtk_label_set_text(GTK_LABEL(wturn), "Black have won");
                     }
                     else
                     {
-                        gtk_label_set_text(wturn, "White have won");
+                        gtk_label_set_text(GTK_LABEL(wturn), "White have won");
                     }
-
-                    //sleep(5);
-                    //quick_message(GTK_WINDOW(window), "coucou les ptis loups");
-                    //removeWidget();
-
-                    
                     return TRUE;
                 }
                 gtk_widget_show(checkLabel);
                 printf("check\n");
             }
-            printf("no check\n");
-            if(castle && isCheckinG(board,bx,byy))
+            else if(castle && isCheckinG(board,bx,byy))
             {
                 printf("Try checkmate castle\n");
                 castle = 0;
@@ -281,18 +256,12 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                     gtk_widget_show(checkMateLabel);
                     if(board[bx+byy*8]->color == BLACK)
                     {
-                        gtk_label_set_text(wturn, "Black have won");
+                        gtk_label_set_text(GTK_LABEL(wturn), "Black have won");
                     }
                     else
                     {
-                        gtk_label_set_text(wturn, "White have won");
+                        gtk_label_set_text(GTK_LABEL(wturn), "White have won");
                     }
-
-                    //sleep(5);
-                    //quick_message(GTK_WINDOW(window), "coucou les ptis loups");
-                    //removeWidget();
-
-                    
                     return TRUE;
                 }
                 gtk_widget_show (checkLabel);
@@ -304,11 +273,11 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
             turn++;
             if(turn%2 == 1)
             {
-                gtk_label_set_text(wturn, "Turn to BLACK");
+                gtk_label_set_text(GTK_LABEL(wturn), "Turn to BLACK");
             }
             else
             {
-                gtk_label_set_text(wturn, "Turn to WHITE");
+                gtk_label_set_text(GTK_LABEL(wturn), "Turn to WHITE");
             }
             printf("End\n");            
         }    
@@ -677,13 +646,13 @@ void stopG()
     gtk_widget_hide(wturn);
     gtk_widget_hide(checkMateLabel);
     gtk_widget_hide(checkLabel);
+    turn = 0;
 }
 void launch()
 {
     set_image();
     gtk_widget_hide(welcome);
     gtk_widget_hide(playLabel);
-    //gtk_label_set_text(wturn, "Turn to WHITE");
     gtk_widget_hide(launchGame);
     board = malloc(64*sizeof(struct piece));
     checkMatevalue = 0;
@@ -691,30 +660,51 @@ void launch()
     turn = 0;
     hasmoved = 0;
     initParty(board, WHITE);
-    
+    gtk_widget_show(wturn);
     gtk_widget_show(stop);
     gtk_widget_show(stopLabel);
-    
-    
 }
 
 int main(int argc, char *argv[] )
 {
 	gtk_init (&argc, &argv);
+
+    // window
+	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+	gtk_container_set_border_width (GTK_CONTAINER (window), 0);
+    gtk_window_set_default_size (GTK_WINDOW(window), 1250, 900);
+    gtk_window_set_resizable (GTK_WINDOW(window), FALSE);
+    gtk_window_set_title(GTK_WINDOW(window), "StockMeat");
+    gtk_widget_show (window);
+
+    // window fixed
+    general = gtk_fixed_new();
+    gtk_widget_show(general);
+    gtk_container_add(GTK_CONTAINER(window), general);
+
+    // eventbox
+    GtkWidget* eventbox = gtk_event_box_new();
+    gtk_widget_set_size_request(eventbox, 800, 800);
+    gtk_widget_show(eventbox);
+    gtk_fixed_put(GTK_FIXED(general), eventbox, 50, 50);
+
+    // chessfixed
+	fixed = gtk_fixed_new();
+	gtk_widget_show (fixed);
+    gtk_container_add(GTK_CONTAINER(eventbox), fixed);
     
+    // chessplate's image
+    GdkPixbuf* ch = gdk_pixbuf_new_from_file_at_scale ("chess/chessplate.jpg", 800, 800, TRUE, NULL);
+    GtkWidget *chess = gtk_image_new();
+    gtk_image_set_from_pixbuf(GTK_IMAGE(chess), ch);
+    gtk_widget_show(chess);
+    gtk_fixed_put(GTK_FIXED(fixed), chess, 0, 0);
+    
+    // promote buttons
     bishop = gtk_button_new();
     queen = gtk_button_new();
     knight = gtk_button_new();
     rook = gtk_button_new();
-
-    launchGame = gtk_button_new();
-    gtk_button_set_label(GTK_BUTTON(launchGame), "New Game");
-    gtk_widget_set_size_request(launchGame, 200, 50);
-
-    stop = gtk_button_new();
-    gtk_button_set_label(GTK_BUTTON(stop), "Stop Game");
-    gtk_widget_set_size_request(stop, 200, 50);
-    
 
     gtk_button_set_label(GTK_BUTTON(bishop), "Bishop");
     gtk_button_set_label(GTK_BUTTON(queen), "Queen");
@@ -731,53 +721,31 @@ int main(int argc, char *argv[] )
     gtk_widget_set_size_request(knight, 100, 50);
     gtk_widget_set_size_request(rook, 100, 50);
 
-	// WINDOW
-	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-	gtk_container_set_border_width (GTK_CONTAINER (window), 0);
-    gtk_window_set_default_size (GTK_WINDOW(window), 1200, 800);
-    gtk_window_set_resizable (GTK_WINDOW(window), FALSE);
-    gtk_window_set_title(GTK_WINDOW(window), "StockMeat");
-	g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    gtk_widget_show (window);
-    
-    //endWindow = gtk_dialog_new();
-
-    stack = gtk_stack_new();
-    gtk_widget_show (stack);
-    gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(stack));
-
-    menu = gtk_fixed_new();
-    gtk_widget_show(menu);
-    general = gtk_fixed_new();
-    gtk_widget_show(general);
-
-    gtk_stack_add_named(GTK_STACK(stack), general, "general");
-    gtk_stack_add_named(GTK_STACK(stack), menu, "menu");
-    
-    //gtk_stack_add_named(GTK_STACK(stack), end, "end");
-
-    
-
+    // load css file
     GdkDisplay *display;
     GdkScreen *screen;
-
     display = gdk_display_get_default();
     screen = gdk_display_get_default_screen(display);
-
     GtkCssProvider* provider;
     provider = gtk_css_provider_new();
     gtk_css_provider_load_from_path(provider, "style.css", NULL);
     gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
     g_object_unref(provider);
 
-    menuTitle = gtk_label_new("STOCKMEAT");
-    gtk_widget_set_size_request(menuTitle, 1200, 200);
-    gtk_widget_set_name(menuTitle, "menuTitle");
-    gtk_widget_show (menuTitle);
+    // buttons play / stop
+
+    launchGame = gtk_button_new();
+    gtk_button_set_label(GTK_BUTTON(launchGame), "New Game");
+    gtk_widget_set_size_request(launchGame, 200, 50);
+    gtk_widget_set_name(launchGame, "button-30");
     gtk_widget_show (launchGame);
-    //gtk_widget_show (stop);
-    //gtk_fixed_put(GTK_FIXED(menu), menuTitle, 0, 50);
-    
+
+    stop = gtk_button_new();
+    gtk_button_set_label(GTK_BUTTON(stop), "Stop Game");
+    gtk_widget_set_name(stop, "button-30");
+    gtk_widget_set_size_request(stop, 200, 50);    
+
+    // labels
 
     title = gtk_label_new("STOCKMEAT");
     gtk_widget_set_size_request(title, 300, 50);
@@ -791,7 +759,6 @@ int main(int argc, char *argv[] )
     checkMateLabel = gtk_label_new("CHECKMATE");
     gtk_widget_set_size_request(checkMateLabel, 400, 50);
     gtk_widget_set_name(checkMateLabel, "check");
-    //gtk_widget_show (checkLabel);
 
     welcome = gtk_label_new("Welcome in");
     gtk_widget_set_size_request(welcome, 400, 50);
@@ -803,74 +770,47 @@ int main(int argc, char *argv[] )
     gtk_widget_set_name(playLabel, "welcome");
     gtk_widget_show (playLabel);
 
-    stopLabel = gtk_label_new("do you want to stop?");
+    stopLabel = gtk_label_new("Do you want to stop?");
     gtk_widget_set_size_request(stopLabel, 400, 50);
     gtk_widget_set_name(stopLabel, "welcome");
-    //gtk_widget_show (stopLabel);
     
     winnerLabel = gtk_label_new("");
     gtk_widget_set_size_request(winnerLabel, 300, 50);
     gtk_widget_set_name(winnerLabel, "h1");
     gtk_widget_show (winnerLabel);
 
-    wturn = gtk_label_new("");
+    wturn = gtk_label_new("Turn to White");
     gtk_widget_set_name(wturn, "texte");
-    gtk_widget_set_name(launchGame, "button-30");
-    gtk_widget_set_name(stop, "button-30");
     gtk_widget_set_size_request(wturn, 400, 50);
-    
-    gtk_widget_show (wturn);
 
-    gtk_fixed_put(GTK_FIXED(general), bishop, 880, 600);
-    gtk_fixed_put(GTK_FIXED(general), queen, 1020, 600);
-    gtk_fixed_put(GTK_FIXED(general), knight, 880, 700);
-    gtk_fixed_put(GTK_FIXED(general), rook, 1020, 700);
-    
-    gtk_fixed_put(GTK_FIXED(general), title, 850, 65);
-    gtk_fixed_put(GTK_FIXED(general), welcome, 800, 10);
-    gtk_fixed_put(GTK_FIXED(general), playLabel, 800, 130);
-    gtk_fixed_put(GTK_FIXED(general), wturn, 800, 260);
-    gtk_fixed_put(GTK_FIXED(general), launchGame, 900, 195);
-    gtk_fixed_put(GTK_FIXED(general), stopLabel, 800, 130);
-    gtk_fixed_put(GTK_FIXED(general), stop, 900, 195);
-    gtk_fixed_put(GTK_FIXED(general), checkLabel, 800, 325);
-    gtk_fixed_put(GTK_FIXED(general), checkMateLabel, 800, 325);
-    //gtk_fixed_put(GTK_FIXED(end), winnerLabel, 0, 0);
+    // met tous les éléments au bon endroit
+    int borderx = 50;
+    int bordery = 50;
 
-    // EVENT BOX
-    GtkWidget* eventbox = gtk_event_box_new();
-    gtk_widget_set_size_request(eventbox, 800, 800);
-    gtk_fixed_put(GTK_FIXED(general), eventbox, 0, 0);
-    
-    
-    gtk_widget_show(eventbox);
+    gtk_fixed_put(GTK_FIXED(general), bishop, 880 + borderx, 600 + bordery);
+    gtk_fixed_put(GTK_FIXED(general), queen, 1020 + borderx, 600 + bordery);
+    gtk_fixed_put(GTK_FIXED(general), knight, 880 + borderx, 700 + bordery);
+    gtk_fixed_put(GTK_FIXED(general), rook, 1020 + borderx, 700 + bordery);
+    gtk_fixed_put(GTK_FIXED(general), title, 850 + borderx, 65+bordery);
+    gtk_fixed_put(GTK_FIXED(general), welcome, 800 + borderx, 10 + bordery);
+    gtk_fixed_put(GTK_FIXED(general), playLabel, 800 + borderx, 130 + bordery);
+    gtk_fixed_put(GTK_FIXED(general), wturn, 800 + borderx, 260 + bordery);
+    gtk_fixed_put(GTK_FIXED(general), launchGame, 900 + borderx, 195 + bordery);
+    gtk_fixed_put(GTK_FIXED(general), stopLabel, 800 + borderx, 130 + bordery);
+    gtk_fixed_put(GTK_FIXED(general), stop, 900 + borderx, 195 + bordery);
+    gtk_fixed_put(GTK_FIXED(general), checkLabel, 800 + borderx, 325 + bordery);
+    gtk_fixed_put(GTK_FIXED(general), checkMateLabel, 800 + borderx, 325 + bordery);	
 
-	// FIXED
-	fixed = gtk_fixed_new();
-	gtk_widget_show (fixed);
-    gtk_container_add(GTK_CONTAINER(eventbox), fixed);
-    
-    GdkPixbuf* ch = gdk_pixbuf_new_from_file_at_scale ("chess/chessplate.jpg", 800, 800, TRUE, NULL);
-    GtkWidget *chess = gtk_image_new();
-    gtk_image_set_from_pixbuf(GTK_IMAGE(chess), ch);
-    gtk_widget_show(chess);
-    gtk_fixed_put(GTK_FIXED(fixed), chess, 0, 0);
+    // connect events
 
-    // MET LES IMAGES
-    //set_image();
-
+    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect (G_OBJECT (eventbox), "button_press_event", G_CALLBACK (button_press_callback), NULL);
-    
     g_signal_connect(bishop, "clicked", G_CALLBACK(promote_bishop), NULL);
     g_signal_connect(queen, "clicked", G_CALLBACK(promote_queen), NULL);
     g_signal_connect(rook, "clicked", G_CALLBACK(promote_rook), NULL);
     g_signal_connect(knight, "clicked", G_CALLBACK(promote_knight), NULL);
-
     g_signal_connect(launchGame, "clicked", G_CALLBACK(launch), NULL);
     g_signal_connect(stop, "clicked", G_CALLBACK(stopG), NULL);
-    //g_signal_connect(queen, "clicked", G_CALLBACK(promotion(board[bxx+byy*8], QUEEN)), NULL);
-    //g_signal_connect(knight, "clicked", G_CALLBACK(promotion(board[bxx+byy*8], KNIGHT)), NULL);
-    //g_signal_connect(rook, "clicked", G_CALLBACK(promotion(board[bxx+byy*8], ROOK)), NULL);
 
 	gtk_main ();
 	return 0;
