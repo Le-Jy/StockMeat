@@ -1,5 +1,4 @@
 #include "eval.h"
-#include "../Structure/board.h"
 
 float whitePawnEval(int x, int y){
     float grid[64]={0,0,0,0,0,0,0,0,5,5,5,5,5,5,5,5,1,1,2,3,3,2,1,1,0.5,0.5,1,2.5,2.5,1,0.5,0.5,0,0,0,2,2,0,0,0,0.5,-0.5,-1,0,0,-1,-0.5,0.5,0.5,1,1,-2,-2,1,1,0.5,0,0,0,0,0,0,0,0};
@@ -111,10 +110,10 @@ float getEval(struct piece** board, int color){
             eval=eval+0.1*(i-1);
         }
         if (whitepawns[i]==0 && blackpawns[i]==0){
-            if (whiterooks[i]>0 && !(blackrooks[i]>0)){
+            if (whiterooks[i]>0 && !blackrooks[i]>0){
                 eval=eval+0.15;
             }
-            if (blackrooks[i]>0 &&  !(whiterooks[i]>0)){
+            if (blackrooks[i]>0 &&  !whiterooks[i]>0){
                 eval=eval-0.15;
             }
         }

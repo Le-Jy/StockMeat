@@ -1,20 +1,16 @@
 #include "algo.h"
-#include "fen.h"
-#include "eval.h"
-#include "../Structure/move.h"
-#include "../Structure/board.h"
-#include "math.h"
 
 
-float* playMove(struct piece** board, int colorPlayer, int turn){
-    char FEN=(getFEN(board, colorPlayer));
-    /*int res=0;
+
+float* playMove(struct piece** board, enum Color ColorPlayer, int turn){
+    char FEN=(getFEN(board, ColorPlayer));
+    int res=0;
     int res2=0;
     int res3=0;
-    int val=0;*/
+    int val=0;
     int color=0;
     float* list;
-    if (colorPlayer == -1){
+    if (ColorPlayer==WHITE){
         color=1;
     }
     if (turn<5){
@@ -37,9 +33,9 @@ float* miniMax(struct piece** board, int depth, float pruninga, float pruningb, 
     float* list=malloc(4*sizeof(float));
     if (depth==0){
         list[0]=getEval(board, whiteturn);
-        list[1]=-1;
-        list[2]=-1;
-        list[3]=-1;
+        list[1]=NULL;
+        list[2]=NULL;
+        list[3]=NULL;
         return list;
     }
     struct piece*** listOfBoards = malloc(64*sizeof(struct piece));
@@ -57,11 +53,10 @@ float* miniMax(struct piece** board, int depth, float pruninga, float pruningb, 
             if (board[i]->role!=0){
                 getMoves(board,board[i]);
                 sortMoves(board,board[i]);
-                for (struct list* moves = board[i]->possibleMoves;moves!=NULL;moves=moves->next)
-                {
+                for (struct list* moves = board[i]->possibleMoves;moves!=NULL,moves=moves->next){
                     struct piece** newBoard = malloc(64*sizeof(struct piece));
                     int j = 0;
-                    for(struct piece* p = board[j]; j<64;j++)
+                    for(struct piece p = board[j], j<64,j++)
                     {
                         newBoard[j] = malloc(sizeof(struct piece));
                         newBoard[j]->role = p->role;
@@ -74,7 +69,7 @@ float* miniMax(struct piece** board, int depth, float pruninga, float pruningb, 
                     }
                     int dest_x = moves->data%8;
                     int dest_y = moves->data/8;
-                    move(newBoard, newBoard[i], dest_x, dest_y);
+                    move(struct piece** newBoard, struct piece* newBoard[i], int dest_x, int dest_y);
                     datalist[cpt]=moves->data;
                     datalistb[2*cpt]=board[i]->x;
                     datalistb[2*cpt+1]=board[i]->y;
@@ -84,16 +79,16 @@ float* miniMax(struct piece** board, int depth, float pruninga, float pruningb, 
             }
         }
         for (int k=0;k<cpt;k++){
-            struct piece** position= listOfBoards[k];
-            list2=miniMax(position,depth-1, pruninga, pruningb, 0);
+            position=listOfBoards[k];
+            list2=minimax(position,depth-1, pruninga, pruningb, 0);
             if (list2[0]>maxEval){
                 maxEval=list2[0];
                 destcoord=datalist[k];
                 startcoordx=datalistb[k];
                 startcoordy=datalistb[k+1];
             }
-            //maxEval=fmax(maxEval,list2[0]);
-            pruninga=fmax(pruninga,list2[0]);
+            maxEval=max(maxEval,list2[0]);
+            pruninga=max(pruninga,list2[0]);
             if (pruningb<=pruninga){
                 break;
             }
@@ -110,10 +105,10 @@ float* miniMax(struct piece** board, int depth, float pruninga, float pruningb, 
             if (board[i]->role!=0){
                 getMoves(board,board[i]);
                 sortMoves(board,board[i]);
-                for (struct list* moves = board[i]->possibleMoves;moves!=NULL;moves=moves->next){
+                for (struct list* moves = board[i]->possibleMoves;moves!=NULL,moves=moves->next){
                     struct piece** newBoard = malloc(64*sizeof(struct piece));
                     int j = 0;
-                    for(struct piece* p = board[j]; j<64;j++)
+                    for(struct piece p = board[j], j<64,j++)
                     {
                         newBoard[j] = malloc(sizeof(struct piece));
                         newBoard[j]->role = p->role;
@@ -124,9 +119,9 @@ float* miniMax(struct piece** board, int depth, float pruninga, float pruningb, 
                         newBoard[j]->realPlayerColor = p->realPlayerColor;
                         newBoard[j]->hasMoved = p->hasMoved;
                     }
-                    int dest_x = moves->data%8;
-                    int dest_y = moves->data/8;
-                    move(newBoard, newBoard[i], dest_x, dest_y);
+                    int dest_x = moves->data%8
+                    int dest_y = moves->data/8
+                    move(struct piece** newBoard, struct piece* newBoard[i], int dest_x, int dest_y);
                     datalist[cpt]=moves->data;
                     datalistb[2*cpt]=board[i]->x;
                     datalistb[2*cpt+1]=board[i]->y;
@@ -136,16 +131,16 @@ float* miniMax(struct piece** board, int depth, float pruninga, float pruningb, 
             }
         }
         for (int k=0;k<cpt;k++){
-            struct piece** position=listOfBoards[k];
-            list2=miniMax(position,depth-1,pruninga, pruningb, 1);
+            position=listOfBoards[k];
+            list2=minimax(position,depth-1,pruninga, pruningb, 1);
             if (list2[0]<minEval){
-                minEval=list2[0];
+                maxEval=list2[0];
                 destcoord=datalist[k];
                 startcoordx=datalistb[k];
                 startcoordy=datalistb[k+1];
             }
-            //minEval=fmin(minEval,list2[0]);
-            pruningb=fmin(pruningb,list2[0]);
+            minEval=min(minEval,eval);
+            pruningb=min(pruningb,eval);
             if (pruningb<=pruninga){
                 break;
             }
