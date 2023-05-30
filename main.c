@@ -73,10 +73,25 @@ GtkWidget* getWidget(int x, int y)
     return res;
 }
 
+void minMax()
+{
+    int ix, iy;
+    int ixx, iyy;
+    ix = 0;
+    iy = 1;
+    ixx = 0;
+    iyy = 2;
+    move(board,board[ix + 8*iy],ixx,iyy);
+    GtkWidget* IA = getWidget(ix*100, iy*100);
+    gtk_fixed_move(GTK_FIXED(fixed), IA, 200, 200);
+    turn++;
+    gtk_label_set_text(GTK_LABEL(wturn), "Turn to WHITE");
+}
+
 static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *event)
 {
     gtk_widget_set_name(event_box, "box");
-    if(x == -1 && y == -1)
+    if(x == -1 && y == -1 && turn%2 == 0)
     {
         x = event->x;
         y = event->y;
@@ -101,7 +116,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
         return TRUE;
     }
 
-    if(x != -1 && y != -1 && dest_x == -1 && dest_y == -1)
+    if(x != -1 && y != -1 && dest_x == -1 && dest_y == -1 && turn%2 == 0)
     {
         dest_x = event->x;
         dest_y = event->y;
@@ -191,10 +206,9 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                         }
                     }
                     hasmoved = 1;
-                    //toMove = widget;
-                    //printf("%f\n", floor(dest_x));
-                    
                     gtk_fixed_move(GTK_FIXED(fixed), toMove, floor(dest_x/100)*100, floor(dest_y/100)*100);
+
+
                 }
             }
             
@@ -274,6 +288,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
             if(turn%2 == 1)
             {
                 gtk_label_set_text(GTK_LABEL(wturn), "Turn to BLACK");
+                minMax();
             }
             else
             {
@@ -661,6 +676,7 @@ void launch()
     hasmoved = 0;
     initParty(board, WHITE);
     gtk_widget_show(wturn);
+    gtk_label_set_text(GTK_LABEL(wturn), "Turn to WHITE");
     gtk_widget_show(stop);
     gtk_widget_show(stopLabel);
 }
