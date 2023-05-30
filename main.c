@@ -151,10 +151,10 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                 if(bxx>bx && canShortCastle(board,board[bx+8*by]))
                 {
                     printf("Try short castle\n");
-                    bxx = bxx - 1;
-                    bx = 5;
                     castle = 1;
                     shortCastle(board,board[bx+8*by]);
+                    bxx = bxx - 1;
+                    bx = 5;
                     printf("Did short castle\n");
                     
                     gtk_fixed_move(GTK_FIXED(fixed), first, 600, by*100);
@@ -164,11 +164,12 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                 if(bxx<bx && canLongCastle(board,board[bx+8*by]))
                 {
                     printf("Try long castle\n");
-                    bxx = bxx + 2;
-                    bx = 3;
+                    
                     castle = 1;
                     //printf("testr2\n");
                     longCastle(board,board[bx+8*by]);
+                    bxx = bxx + 2;
+                    bx = 3;
                     hasmoved = 1;
                     //toMove = widget;
                     //printf("%f\n", floor(dest_x));
@@ -264,7 +265,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                     
                     return TRUE;
                 }
-                gtk_widget_show (checkLabel);
+                gtk_widget_show(checkLabel);
                 printf("check\n");
             }
             printf("no check\n");

@@ -825,15 +825,31 @@ int cannotProtectKing(struct piece** board,int dangerousmoves[8], int KingColor,
             int add;
             if(x-y == board[Kindex]->x)
             {
-                add = 9;
+                if(y<board[Kindex]->y)
+                    add = -7;
+                else
+                    add = 9;
             }
             else if(x == board[Kindex]->x)
             {
-                add = 8;
+                if(y<board[Kindex]->y)
+                    add = -8;
+                else
+                    add = 8;
+            }
+            else if(y==board[Kindex]->y)
+            {
+                if(x<board[Kindex]->x)
+                    add = -1;
+                else
+                    add = 1;
             }
             else
             {
-                add = 7;
+                if(y<board[Kindex]->y)
+                    add = -9;
+                else
+                    add = 7;
             }
             while(p->possibleMoves != NULL)
             {
