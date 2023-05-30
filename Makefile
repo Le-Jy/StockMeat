@@ -1,8 +1,8 @@
 # Makefile
 
 CC = gcc
-CFLAGS = `pkg-config --cflags gtk+-3.0` -Wall -Wextra -O3
-LDLIBS = `pkg-config --libs gtk+-3.0`
+CFLAGS = `pkg-config --cflags gtk+-3.0` -Wall -Wextra -O3 -lm
+LDLIBS = `pkg-config --libs gtk+-3.0` -lm
 
 SRC = main.c Game/game.c Structure/board.c Structure/piece.c Structure/move.c MiniMax/algo.c MiniMax/eval.c MiniMax/fen.c
 OBJ = ${SRC:.c=.o}

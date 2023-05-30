@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
 #include "Game/game.h"
 #include <math.h>
+#include "MiniMax/algo.h"
 
 GtkWidget *fixed;
 
@@ -75,6 +76,10 @@ GtkWidget* getWidget(int x, int y)
 
 void minMax()
 {
+    float* res = malloc(4*sizeof(float));
+
+    res = playMove(board, 0, turn);
+    //printf("%f, %f, %f, %f \n", res[0], res[1], res[2], res[3]);
     int ix, iy;
     int ixx, iyy;
     ix = 0;

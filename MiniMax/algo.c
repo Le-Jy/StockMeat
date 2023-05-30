@@ -3,11 +3,11 @@
 #include "eval.h"
 #include "../Structure/move.h"
 #include "../Structure/board.h"
-#include "math.h"
+#include <math.h>
 
 
 float* playMove(struct piece** board, int colorPlayer, int turn){
-    char FEN=(getFEN(board, colorPlayer));
+    char* FEN= getFEN(board, colorPlayer);
     /*int res=0;
     int res2=0;
     int res3=0;
