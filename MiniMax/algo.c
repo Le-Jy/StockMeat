@@ -15,7 +15,7 @@ float* playMove(struct piece** board, enum Color ColorPlayer, int turn){
     }
     if (turn<5){
         list=database(FEN);
-        if (list[1]!=NULL){
+        if (list[1]!=-1){
             return list;
         }
         else{
