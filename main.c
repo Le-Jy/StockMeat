@@ -76,9 +76,6 @@ GtkWidget* getWidget(int x, int y)
 
 void minMax()
 {
-    float* res = malloc(4*sizeof(float));
-
-    res = playMove(board, 0, turn);
     //printf("%f, %f, %f, %f \n", res[0], res[1], res[2], res[3]);
     int ix, iy;
     int ixx, iyy;
@@ -96,7 +93,7 @@ void minMax()
 static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *event)
 {
     gtk_widget_set_name(event_box, "box");
-    if(x == -1 && y == -1 && turn%2 == 0)
+    if(x == -1 && y == -1)
     {
         x = event->x;
         y = event->y;
@@ -121,7 +118,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
         return TRUE;
     }
 
-    if(x != -1 && y != -1 && dest_x == -1 && dest_y == -1 && turn%2 == 0)
+    if(x != -1 && y != -1 && dest_x == -1 && dest_y == -1)
     {
         dest_x = event->x;
         dest_y = event->y;
@@ -168,7 +165,7 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
                     printf("Try long castle\n");
                     
                     castle = 1;
-                    //printf("testr2\n");
+                    
                     longCastle(board,board[bx+8*by]);
                     bxx = bxx + 2;
                     bx = 3;
@@ -293,7 +290,6 @@ static gboolean button_press_callback (GtkWidget *event_box, GdkEventButton *eve
             if(turn%2 == 1)
             {
                 gtk_label_set_text(GTK_LABEL(wturn), "Turn to BLACK");
-                minMax();
             }
             else
             {
@@ -540,6 +536,7 @@ void removeWidget()
 void promote_bishop()
 {
     promotion(board[bxx+byy*8], BISHOP);
+    printboard(board);
     gtk_widget_set_sensitive (GTK_WIDGET(bishop), FALSE);
     gtk_widget_set_sensitive (GTK_WIDGET(queen), FALSE);
     gtk_widget_set_sensitive (GTK_WIDGET(knight), FALSE);
